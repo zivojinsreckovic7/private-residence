@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Container } from "@/components/ui/container";
 import { Accent, Heading } from "@/components/ui/heading";
@@ -99,12 +100,75 @@ export function Hero() {
     let frame = 0;
     let eased = 0;
     let duration = 0;
+    let activated = false;
+    let hasFrame = false;
+
+    /**
+     * Latched, not read live. `readyState` dips back below HAVE_CURRENT_DATA
+     * while a seek is in flight, so testing it on every tick throttles the
+     * scrub badly on desktop: it costs about 40% of the distinct frames across
+     * a fast scroll and turns a 0.6s worst-case jump into 1.3s. What actually
+     * needs guarding is the first seek, before there has ever been any decoded
+     * data to paint.
+     */
+    const noteFrame = () => {
+      if (video.readyState >= 2) hasFrame = true;
+    };
+    noteFrame();
+    video.addEventListener("loadeddata", noteFrame);
+    video.addEventListener("canplay", noteFrame);
 
     const readDuration = () => {
       duration = Number.isFinite(video.duration) ? video.duration : 0;
     };
     readDuration();
     video.addEventListener("loadedmetadata", readDuration);
+
+    /**
+     * iOS will not buffer a video it has never been asked to play. It reads
+     * `preload="auto"` as little more than "fetch the metadata", so a video
+     * that is only ever seeked has no decoded data behind it and paints
+     * nothing at all: the element goes blank the moment the poster is
+     * displaced by the first seek.
+     *
+     * Muted and inline means we are allowed to start it, so we start it and
+     * immediately stop it. That is enough to make the media pipeline real.
+     */
+    const activate = () => {
+      if (activated) return;
+      activated = true;
+      // React does not emit the `muted` attribute into server-rendered HTML,
+      // and an unmuted video is not allowed to start on its own.
+      video.muted = true;
+      const started = video.play();
+      if (!started) return;
+      started
+        .then(() => video.pause())
+        .catch(() => {
+          // Refused. The first time the reader touches the screen is the
+          // next chance to try.
+          activated = false;
+        });
+    };
+
+    activate();
+    const onGesture = () => activate();
+
+    /**
+     * Whether to wait for each seek to land before asking for the next one.
+     *
+     * Desktop browsers coalesce a stream of `currentTime` writes and keep up
+     * at frame rate, so gating them there measurably costs smoothness: it
+     * drops the walkthrough from ~257 distinct frames across a fast scroll to
+     * 88, and introduces jumps of over a second. Touch devices cannot service
+     * that rate and fall behind or blank instead, which is far worse.
+     *
+     * A pointer query rather than a user-agent test: the thing that actually
+     * differs is the class of device, and this is how the platform reports it.
+     */
+    const gateSeeks = window.matchMedia("(pointer: coarse)").matches;
+    window.addEventListener("touchstart", onGesture, { passive: true });
+    window.addEventListener("pointerdown", onGesture);
 
     /** Scroll consumed since the top of the section, in px. */
     const scrolled = () => -section.getBoundingClientRect().top;
@@ -126,8 +190,20 @@ export function Hero() {
       const target = p * Math.max(duration - TAIL, 0);
       eased += (target - eased) * SMOOTHING;
       if (Math.abs(target - eased) < SETTLED) eased = target;
-      // Seeking to an unchanged time still costs a decode, so guard it.
-      if (duration > 0 && Math.abs(video.currentTime - eased) > SETTLED) {
+
+      // Three guards:
+      //   hasFrame    - seeking before there has ever been decoded data paints
+      //                 nothing, which is what leaves the element blank on iOS.
+      //   gateSeeks   - on touch devices, never queue a second seek on top of
+      //                 an unfinished one. A 120Hz screen would otherwise ask
+      //                 for 120 seeks a second and the decoder gives up.
+      //   SETTLED     - seeking to an unchanged time still costs a decode.
+      if (
+        duration > 0 &&
+        hasFrame &&
+        !(gateSeeks && video.seeking) &&
+        Math.abs(video.currentTime - eased) > SETTLED
+      ) {
         video.currentTime = eased;
       }
 
@@ -191,6 +267,10 @@ export function Hero() {
       observer.disconnect();
       if (frame) cancelAnimationFrame(frame);
       video.removeEventListener("loadedmetadata", readDuration);
+      video.removeEventListener("loadeddata", noteFrame);
+      video.removeEventListener("canplay", noteFrame);
+      window.removeEventListener("touchstart", onGesture);
+      window.removeEventListener("pointerdown", onGesture);
     };
   }, []);
 
@@ -205,27 +285,38 @@ export function Hero() {
       style={{ "--hero-scroll": `${SCROLL_VH}vh` } as React.CSSProperties}
     >
       <div className="sticky top-0 h-dvh overflow-clip bg-surface-deep">
-        <div
-          ref={stageRef}
-          className="absolute inset-0 origin-center will-change-transform"
-        >
-        <video
-          ref={videoRef}
-          poster="/hero/walkthrough-poster.jpg"
-          preload="auto"
-          muted
-          playsInline
-          disablePictureInPicture
-          aria-label="A walkthrough of the residence, from the living room out to the pool terrace."
-          className="absolute inset-0 size-full object-cover"
-        >
-          <source
-            src="/hero/walkthrough-1080.mp4"
-            type="video/mp4"
-            media="(min-width: 768px)"
+        {/* No will-change here: it promotes a layer containing a video for
+            the whole scroll, which iOS composites badly, and the stage is
+            only transformed during the last viewport of the handoff. */}
+        <div ref={stageRef} className="absolute inset-0 origin-center">
+          {/* The floor. If the video cannot paint a frame, this shows through
+              instead of black, so the worst case is a still photograph. */}
+          <Image
+            src="/hero/walkthrough-poster.jpg"
+            alt=""
+            fill
+            priority
+            sizes="100vw"
+            className="object-cover"
           />
-          <source src="/hero/walkthrough-720.mp4" type="video/mp4" />
-        </video>
+
+          <video
+            ref={videoRef}
+            poster="/hero/walkthrough-poster.jpg"
+            preload="auto"
+            muted
+            playsInline
+            disablePictureInPicture
+            aria-label="A walkthrough of the residence, from the living room out to the pool terrace."
+            className="absolute inset-0 size-full object-cover"
+          >
+            <source
+              src="/hero/walkthrough-1080.mp4"
+              type="video/mp4"
+              media="(min-width: 768px)"
+            />
+            <source src="/hero/walkthrough-720.mp4" type="video/mp4" />
+          </video>
 
         {/*
           Two scrims with different jobs. The first is constant and keeps the

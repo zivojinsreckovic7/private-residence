@@ -273,6 +273,25 @@ itself; against anything else the JPEG shows a box.
   wrong effect.
 - The hero video's scrub is clamped by `TAIL` because the source footage ends
   on a black frame.
+- **The hero video has to be started once before it can be scrubbed.** iOS
+  reads `preload="auto"` as little more than "fetch the metadata", so a video
+  that is only ever seeked has no decoded data behind it and paints nothing:
+  the element goes blank the moment the first seek displaces the poster. The
+  effect calls `play()` then `pause()` to make the pipeline real, retrying on
+  the first touch if autoplay was refused (Low Power Mode refuses it). It also
+  sets `video.muted` imperatively, because React does not put the `muted`
+  attribute into server-rendered HTML and an unmuted video may not start.
+- **Latch video readiness; never test `readyState` per tick.** It dips back
+  below HAVE_CURRENT_DATA while a seek is in flight, so a per-tick test
+  throttles the scrub badly: measured at 40% fewer distinct frames across a
+  fast scroll, and a worst-case jump of 1.3s instead of 0.6s. Guard the *first*
+  seek only.
+- Waiting for each seek to land before issuing the next is right on touch
+  devices and wrong on desktop, where browsers coalesce the writes and keep up.
+  `(pointer: coarse)` picks between them. A 120Hz phone would otherwise be
+  asked for 120 seeks a second.
+- A poster image sits underneath the hero video, so a frame that cannot be
+  painted degrades to the still rather than to black.
 - When testing scroll positions in a headless browser, pass
   `behavior: 'instant'`. `scroll-behavior: smooth` is on, and a short wait will
   measure the page mid-flight and look exactly like a broken sticky.
