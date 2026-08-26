@@ -77,7 +77,7 @@ export function FinalCta() {
                 {site.fullName}. Your private escape in Cyprus.
               </p>
               <Magnetic className="mt-12 inline-block">
-                <Button href="#contact" size="lg" icon>
+                <Button href="/contact" size="lg" icon>
                   {RESERVE_CTA}
                 </Button>
               </Magnetic>

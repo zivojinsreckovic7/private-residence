@@ -37,6 +37,10 @@ src/
     layout.tsx         fonts, metadata, header and footer chrome
     globals.css        design tokens + the handful of global rules
     page.tsx           home
+    about/             the long-form about page, written for search
+    contact/           the enquiry page
+    experiences/       what a stay is like, plus the guest quotes
+    gallery/           the full photography set
     favicon.ico        the crest, 16/32/48; see scripts/make-icons.py
     icon.png           the crest, 512
     apple-icon.png     the crest, 180
@@ -65,8 +69,15 @@ public/
 
 `@/*` maps to `src/*`.
 
-Gallery filenames describe the shot (`pool-through-bougainvillea.jpeg`), so a
-gallery's *order* belongs in code, never in a numeric prefix.
+Gallery filenames are *meant* to describe the shot
+(`pool-through-bougainvillea.jpeg`), so a gallery's *order* belongs in code,
+never in a numeric prefix. **Several of them are wrong**, so never write alt
+text from a file name — open the image. Known liars:
+`living/living-and-dining-toward-pool.jpeg` is the kitchen bar seen from the
+dining table, and `kitchen/kitchen-island-and-display-shelves.jpeg` is the
+living room looking out to the pool. The verified descriptions all live in
+`lib/gallery.ts`, which is the single manifest both the wall and the grid read;
+copy from there rather than re-deriving them.
 
 # Theme notes
 
@@ -102,7 +113,11 @@ line below. Use it for one word or a short phrase, never a whole heading.
 `text-label` need no responsive variants.
 
 **Shape lock.** Interactive elements are full pills. Surfaces are near-sharp at
-`rounded-surface` (2px). That split is the rule; do not mix others in.
+`rounded-surface` (2px). That split is the rule; do not mix others in. The one
+exception is `CtaBanner`, which is a `rounded-2xl` white card on a grey band,
+by request. It is the only mid radius and the only white surface sitting on
+another surface, and both are what make it read as an offer rather than as
+another chapter. Do not "correct" it back.
 
 **Motion.** Custom easings only (`ease-out-expo`, `ease-swift`) with
 `--dur-fast/base/slow`. Everything animates `transform` and `opacity` only.
@@ -125,8 +140,101 @@ the unit we iterate on.
 Repeating items inside a section (highlights, destination cards, FAQ entries,
 day parts) are a `const` array at the top of that section's file.
 
-**Nav anchors.** `#residence`, `#experience`, `#cyprus`, `#gallery`, `#about`,
-`#contact`. Keep them on the sections the nav points at.
+**Nav anchors.** `#residence`, `#experience`, `#cyprus`. Keep them on the
+sections the nav points at. The nav links to them as `/#residence` and so on,
+so the nav still works from the standalone pages, where a bare fragment would
+have nothing to scroll to.
+
+**Contact, About, Gallery and Experience are routes, not anchors.** Every
+reservation CTA points at `/contact`; the nav's other three point at `/about`,
+`/gallery` and `/experiences`. The landing page keeps its own `#contact`,
+`#about`, `#gallery` and `#experience` sections as its own moments, but nothing
+links to those anchors any more: the sections are the page's argument, the
+routes are what search and the nav address. Only `#residence`, `#experience`'s
+neighbours `#cyprus` and the rest are still nav targets.
+
+`/experiences` composes the landing page's own experience sections rather than
+restating them — `Experience`, `Occasions`, `Testimonials`, `Personal` — so
+there is one set of that copy, not two that drift apart. Only its hero is
+written for the page. It deliberately carries no pinned scene: `DayParts` is
+the landing page's moment and repeating it would spend it twice.
+
+**`sections/photo-hero.tsx` is the standing-page hero**, shared by `/gallery`
+and `/experiences`. Its scrim is a prop rather than a constant because it
+serves the photograph, not the layout: a shot that is bright where the copy
+lands needs more than one that is already dark there.
+
+`/gallery` is a full page rather than an index: a photographic hero, then
+`sections/gallery-wall.tsx`, then the complete set grouped by room, then
+`<Contact>` and `<FindUs>`.
+
+The wall is the sixth scroll-linked moment on the site and the largest: all 28
+photographs on one horizontal track, panned by vertical scroll while the stage
+holds, with the room label and the progress rail driven from the same
+MotionValue. Three things about it are load-bearing:
+
+- **The track measures itself.** Widths come from `SHAPES`, and the pan
+  distance is computed from the data, so adding or removing a photograph cannot
+  leave a hand-written travel constant silently wrong. (The landing page's
+  shorter strip still carries one; that one you must update by hand.)
+- **Width is vw, height is vh.** Deriving height from width leaves every frame
+  about half the height of the stage on a laptop. The printed aspect drifts a
+  little with the window's ratio and `object-cover` absorbs it.
+- **The room labels all stay in the DOM**, opacity only, the same as the day
+  scene. They stay readable to a crawler and a screen reader, and the swap
+  costs nothing per frame.
+
+It pans at ~1.6vw per vh against the landing strip's ~1.14, because it is three
+times as long and would otherwise turn the page into a corridor.
+
+Because the nav is a mixed list of routes and fragments, chrome links go
+through `<AppLink>`: routes get `next/link`, so moving to `/contact` is a
+client navigation and does not replay the loading curtain, while fragments stay
+plain anchors, because the App Router forces an instant jump on hash navigation
+and would throw away `scroll-behavior: smooth`.
+
+**The about page is a reading page with a media rhythm.** `app/about/page.tsx`
+holds the copy in `SECTIONS` and composes the five parts explicitly rather than
+in a loop, because each one carries a different treatment: split row, dark
+summary plate, image pair, photo strip, full-bleed band, three-up grid. That
+variety is the only thing keeping 1,100 words of search copy from reading as a
+wall, so keep neighbouring blocks in different shapes when editing it. The
+prose sits in a `max-w-[46rem]` column inside the full-width container, so the
+hairlines and photography run the usual width and everything shares a left
+edge.
+
+`ui/photo-strip.tsx` is the horizontal strip: native scroll with CSS snap
+points, never a carousel library. Its `scroll-padding-left` must stay equal to
+its `padding-left` (both `--edge`), or mandatory snapping aligns the first
+frame to the scrollport and scrolls the padding away, cutting the frame off
+against the window edge.
+
+**The reservation is offered three times on the way down.** The page is long,
+so `CtaBanner` sits after `Highlights`, after `Spaces` and after `Gallery`, in
+addition to the CTAs already in the hero, `Personal`, `Reservations` and
+`FinalCta`. Each placement carries its own line, written to follow the section
+above it; only the label is fixed. Keep them spaced across the middle of the
+page, which is the stretch that had no way to book.
+
+**The address lives in `site.ts`.** `site.address` holds both the postal form
+(`lines`, written the way it goes on an envelope) and the flat fields
+schema.org wants; keep the two in step.
+
+`sections/find-us.tsx` is the "Where to Find Us" section: address, plus code,
+coordinates, a maps link and the frame. It is a section in its own right on the
+home page, `/contact` and `/about`, not a map tacked to the bottom of a contact
+block. Every fact is text beside the frame rather than inside it, because a map
+tile is invisible to a crawler and to anyone blocking third-party frames.
+`ui/map-embed.tsx` is the frame alone and is the only third-party embed on the
+site. The address is also in the footer on every page and in the contact
+sections.
+
+**The guest quotes are placeholders and must not be published.**
+`sections/testimonials.tsx` carries the sample quotes from the copy document
+with the attributions left as the literal strings "Guest name" and "Country",
+so nothing invented can ship by accident. It now renders on the landing page
+*and* `/experiences`, so there are two places to check. Replace with real
+reviews, or delete the section from both — never fill it in.
 
 **One label per intent.** `RESERVE_CTA` in `lib/site.ts` is the booking label,
 used in the header, hero, reservations and final CTA. The brief also specifies
@@ -342,6 +450,14 @@ The windows are spaced so no two overlap, and the darkening veil follows
 whichever caption is showing, which means the walkthrough opens back up in the
 gaps between them. That rhythm is the point: retune `CAPTIONS`, not the fades,
 if the pacing needs to change.
+
+**The last window ends at 1 and must stay that way.** `progress()` is clamped
+to 1, so `p > to` never fires and the third caption never runs its leaving
+fade. It holds to the end of the scrub and the handoff carries it out: the
+captions live inside the stage, so they recede and dim with the frame as the
+introduction plate rides up. Give it a `to` below 1 again and the copy
+disappears before the plate arrives, leaving an empty frame for the last
+stretch of the pin.
 
 **Three scrims, not two.** Under the caption veil and the top-and-bottom
 gradient sits a flat `bg-surface-deep/30` on the footage itself. The

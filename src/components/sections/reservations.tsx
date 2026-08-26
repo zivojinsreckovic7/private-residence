@@ -62,7 +62,7 @@ export function Reservations() {
 
         <Reveal delay={120}>
           <Magnetic className="mt-16 inline-block">
-            <Button href="#contact" size="lg" icon>
+            <Button href="/contact" size="lg" icon>
               {RESERVE_CTA}
             </Button>
           </Magnetic>

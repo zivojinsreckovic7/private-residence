@@ -43,11 +43,18 @@ const TAIL = 0.35;
  * When each caption is fully legible, in scroll progress. Each one fades in
  * over the FADE before `from` and out over the FADE after `to`, so the windows
  * are spaced to never overlap.
+ *
+ * The last window ends at 1 on purpose: `progress()` is clamped to 1, so
+ * `p > to` never becomes true and the caption never runs its leaving fade. It
+ * holds to the end of the scrub and is then carried out by the handoff, which
+ * recedes and dims the whole stage — copy included — as the next plate rides
+ * up over it. Fading it out first left the reader looking at an empty frame
+ * for the last stretch of the pin.
  */
 const CAPTIONS = [
   { from: 0.0, to: 0.16 },
   { from: 0.36, to: 0.54 },
-  { from: 0.74, to: 0.92 },
+  { from: 0.74, to: 1 },
 ] as const;
 
 const FADE = 0.09;
@@ -353,7 +360,7 @@ export function Hero() {
             beneath the Mediterranean sun.
           </p>
           <div className="mt-10 flex flex-wrap justify-center gap-3">
-            <Button href="#contact" size="lg" icon>
+            <Button href="/contact" size="lg" icon>
               {RESERVE_CTA}
             </Button>
             <Button href="#residence" size="lg" variant="onDark">

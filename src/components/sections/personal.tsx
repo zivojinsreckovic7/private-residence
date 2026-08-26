@@ -31,7 +31,7 @@ export function Personal() {
           </Reveal>
           <Reveal delay={200}>
             <Magnetic className="mt-12 inline-block">
-              <Button href="#contact" icon size="lg">
+              <Button href="/contact" icon size="lg">
                 Plan Your Stay
               </Button>
             </Magnetic>

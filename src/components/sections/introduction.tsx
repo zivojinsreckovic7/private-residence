@@ -23,10 +23,10 @@ export function Introduction() {
       <Section tone="canvas" className="pt-32 pb-40 md:pt-44 md:pb-56">
         <Container>
           <Reveal variant="drape">
-            <Heading size="mega" className="max-w-[8ch]">
-              Privacy,
+            <Heading size="mega" className="max-w-[11ch]">
+              The whole
               <br />
-              <Accent>Elevated.</Accent>
+              <Accent>house.</Accent>
             </Heading>
           </Reveal>
 

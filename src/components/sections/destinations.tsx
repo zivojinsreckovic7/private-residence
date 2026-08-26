@@ -52,7 +52,7 @@ export function Destinations() {
               className="border-b border-line"
             >
               <a
-                href="#contact"
+                href="/contact"
                 className="group grid items-baseline gap-3 py-8 md:grid-cols-12 md:gap-8"
               >
                 <h3 className="font-serif text-headline font-light text-ink transition-[color,transform] duration-(--dur-base) ease-out-expo group-hover:translate-x-2 group-hover:text-accent md:col-span-4">

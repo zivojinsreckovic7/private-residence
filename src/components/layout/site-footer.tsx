@@ -1,4 +1,5 @@
 import { InstagramLogo } from "@phosphor-icons/react/ssr";
+import { AppLink } from "@/components/ui/app-link";
 import { Container } from "@/components/ui/container";
 import { Section } from "@/components/ui/section";
 import { Wordmark } from "@/components/ui/wordmark";
@@ -29,13 +30,13 @@ export function SiteFooter() {
 
           <nav aria-label="Footer" className="flex flex-col gap-4">
             {navigation.map((item) => (
-              <a
+              <AppLink
                 key={item.href}
                 href={item.href}
                 className="text-meta text-on-dark-muted transition-colors duration-(--dur-fast) hover:text-accent-bright"
               >
                 {item.label}
-              </a>
+              </AppLink>
             ))}
           </nav>
 
@@ -48,6 +49,25 @@ export function SiteFooter() {
               label="General Enquiries"
               value={site.contact.general}
             />
+            <div>
+              <p className="text-label uppercase text-on-dark/45">Address</p>
+              <address className="text-meta mt-2 not-italic text-on-dark-muted">
+                {site.address.lines.map((line) => (
+                  <span key={line} className="block">
+                    {line}
+                  </span>
+                ))}
+              </address>
+              <a
+                href={site.address.mapsUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="text-meta mt-3 inline-block text-on-dark-muted underline underline-offset-4 transition-colors duration-(--dur-fast) hover:text-accent-bright"
+              >
+                Open in Google Maps
+              </a>
+            </div>
+
             <a
               href={site.url}
               className="text-meta text-on-dark-muted transition-colors duration-(--dur-fast) hover:text-accent-bright"
@@ -61,12 +81,12 @@ export function SiteFooter() {
           <ul className="flex flex-wrap gap-x-8 gap-y-3">
             {legalLinks.map((link) => (
               <li key={link.href}>
-                <a
+                <AppLink
                   href={link.href}
                   className="text-meta text-on-dark-muted transition-colors duration-(--dur-fast) hover:text-accent-bright"
                 >
                   {link.label}
-                </a>
+                </AppLink>
               </li>
             ))}
           </ul>

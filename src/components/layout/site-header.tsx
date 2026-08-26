@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { AppLink } from "@/components/ui/app-link";
 import { Magnetic } from "@/components/motion/magnetic";
 import { Button } from "@/components/ui/button";
 import { Wordmark } from "@/components/ui/wordmark";
@@ -46,9 +47,11 @@ export function SiteHeader() {
             "xl:mx-auto",
           )}
         >
-          <a href="#top" aria-label={`${site.fullName}, home`}>
+          {/* Root, not `#top`: the mark has to return home from a standalone
+              page, and on the landing page `/` still lands on the hero. */}
+          <AppLink href="/" aria-label={`${site.fullName}, home`}>
             <Wordmark />
-          </a>
+          </AppLink>
 
           <nav className="hidden items-center gap-8 lg:flex">
             {navigation.map((item) => (
@@ -60,7 +63,7 @@ export function SiteHeader() {
 
           <div className="flex items-center gap-2">
             <Magnetic className="hidden sm:block">
-              <Button href="#contact" icon>
+              <Button href="/contact" icon>
                 {RESERVE_CTA}
               </Button>
             </Magnetic>
@@ -92,7 +95,7 @@ function NavLink({
   children: React.ReactNode;
 }) {
   return (
-    <a
+    <AppLink
       href={href}
       className="group relative text-meta text-ink-muted transition-colors duration-(--dur-fast) hover:text-ink"
     >
@@ -105,7 +108,7 @@ function NavLink({
           "group-hover:scale-x-100",
         )}
       />
-    </a>
+    </AppLink>
   );
 }
 
@@ -136,7 +139,7 @@ function MobileMenu({ open, onClose }: { open: boolean; onClose: () => void }) {
       <div className="flex h-full flex-col justify-between px-5 pt-28 pb-10 md:px-10">
         <nav className="flex flex-col items-start gap-1">
           {navigation.map((item, i) => (
-            <a
+            <AppLink
               key={item.href}
               href={item.href}
               onClick={onClose}
@@ -147,7 +150,7 @@ function MobileMenu({ open, onClose }: { open: boolean; onClose: () => void }) {
               )}
             >
               {item.label}
-            </a>
+            </AppLink>
           ))}
         </nav>
 
@@ -158,7 +161,7 @@ function MobileMenu({ open, onClose }: { open: boolean; onClose: () => void }) {
             open ? "translate-y-0 opacity-100" : "translate-y-8 opacity-0",
           )}
         >
-          <Button href="#contact" size="lg" icon onClick={onClose}>
+          <Button href="/contact" size="lg" icon onClick={onClose}>
             {RESERVE_CTA}
           </Button>
           <a
