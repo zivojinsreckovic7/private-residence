@@ -325,9 +325,16 @@ the `CAPTIONS` windows (scroll progress at which each is fully legible). Each
 fades in over `FADE` before its window and out over `FADE` after it, drifting
 `DRIFT` px upward the whole time so the movement always runs with the scroll.
 The windows are spaced so no two overlap, and the darkening veil follows
-whichever caption is showing, which means the walkthrough goes clean and bright
-in the gaps between them. That rhythm is the point: retune `CAPTIONS`, not the
-fades, if the pacing needs to change.
+whichever caption is showing, which means the walkthrough opens back up in the
+gaps between them. That rhythm is the point: retune `CAPTIONS`, not the fades,
+if the pacing needs to change.
+
+**Three scrims, not two.** Under the caption veil and the top-and-bottom
+gradient sits a flat `bg-surface-deep/30` on the footage itself. The
+walkthrough is a heavily compressed source and its softness shows at full
+brightness, so it is knocked back rather than presented as a bright
+photograph. Retune that one value if the hero wants more or less footage; the
+other two are doing different jobs and are not the dial for this.
 
 Captions are found by `data-caption` in document order rather than through
 refs, which keeps `<Caption>` free of ref plumbing and matches the fact that the

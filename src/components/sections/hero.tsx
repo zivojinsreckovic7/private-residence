@@ -319,10 +319,14 @@ export function Hero() {
           </video>
 
         {/*
-          Two scrims with different jobs. The first is constant and keeps the
-          white nav readable against a bright sky for the whole scroll. The
-          second sits behind the captions only, and fades with them.
+          Three scrims with different jobs. The first is flat and sits on the
+          footage itself: the walkthrough is a heavily compressed source and
+          its softness shows at full brightness, so it is knocked back a little
+          rather than presented as a bright photograph. The second is constant
+          and keeps the white nav readable against a bright sky for the whole
+          scroll. The third sits behind the captions only, and fades with them.
         */}
+        <div aria-hidden className="absolute inset-0 bg-surface-deep/30" />
         <div
           aria-hidden
           className="absolute inset-0 bg-gradient-to-b from-surface-deep/60 via-transparent to-surface-deep/30"
