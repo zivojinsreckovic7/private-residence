@@ -5,8 +5,14 @@ import { ArrowLeft, ArrowRight } from "@phosphor-icons/react/ssr";
 import { Reveal } from "@/components/motion/reveal";
 import { Container } from "@/components/ui/container";
 import { Figure } from "@/components/ui/figure";
+import type { Lang } from "@/lib/i18n";
 
 type Item = { src: string; alt: string };
+
+const COPY = {
+  en: { previous: "Previous photographs", next: "Next photographs" },
+  sr: { previous: "Prethodne fotografije", next: "Sledeće fotografije" },
+} as const;
 
 /**
  * The container's own content edge, so the first frame lines up with the type
@@ -28,13 +34,16 @@ const EDGE = "calc(max(0px, (100vw - 1240px)) / 2 + 2rem)";
  * the photographs themselves are not focusable.
  */
 export function PhotoStrip({
+  lang,
   title,
   items,
 }: {
+  lang: Lang;
   title: string;
   items: readonly Item[];
 }) {
   const track = useRef<HTMLDivElement>(null);
+  const t = COPY[lang];
 
   const nudge = (direction: 1 | -1) => {
     const el = track.current;
@@ -55,10 +64,10 @@ export function PhotoStrip({
           </h2>
         </Reveal>
         <div className="hidden shrink-0 gap-2 md:flex">
-          <Arrow onClick={() => nudge(-1)} label="Previous photographs">
+          <Arrow onClick={() => nudge(-1)} label={t.previous}>
             <ArrowLeft size={18} weight="light" />
           </Arrow>
-          <Arrow onClick={() => nudge(1)} label="Next photographs">
+          <Arrow onClick={() => nudge(1)} label={t.next}>
             <ArrowRight size={18} weight="light" />
           </Arrow>
         </div>

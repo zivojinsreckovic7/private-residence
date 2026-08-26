@@ -33,24 +33,29 @@ In practice:
 
 ```
 src/
+  proxy.ts             locale routing; see "Two languages" below
   app/                 routes only
-    layout.tsx         fonts, metadata, header and footer chrome
     globals.css        design tokens + the handful of global rules
-    page.tsx           home
-    about/             the long-form about page, written for search
-    contact/           the enquiry page
-    experiences/       what a stay is like, plus the guest quotes
-    gallery/           the full photography set
     favicon.ico        the crest, 16/32/48; see scripts/make-icons.py
     icon.png           the crest, 512
     apple-icon.png     the crest, 180
-    styleguide/        living specimen of the system, noindex, not linked
+    [lang]/            every route, once, in both languages
+      layout.tsx       fonts, metadata, header and footer chrome
+      page.tsx         home
+      about/           the long-form about page, written for search
+      contact/         the enquiry page
+      experiences/     what a stay is like, plus the guest quotes
+      gallery/         the full photography set
+      styleguide/      living specimen of the system, noindex, not linked
   components/
     ui/                primitives, no page knowledge  (Button, Section, ...)
     layout/            site chrome                    (SiteHeader, SiteFooter)
     motion/            the motion system              (Reveal, Parallax, ...)
     sections/          one file per landing section   (Hero, Cyprus, Faq, ...)
-  lib/                 fonts, brand config, helpers
+  lib/
+    i18n.ts            languages, `localePath()`, the copy convention
+    metadata.ts        canonical + hreflang for a page
+    ...                fonts, brand config, helpers
 scripts/
   make-icons.py        regenerates the three app icons from the crest
 media-source/          original masters, not served, not deployed
@@ -78,6 +83,58 @@ dining table, and `kitchen/kitchen-island-and-display-shelves.jpeg` is the
 living room looking out to the pool. The verified descriptions all live in
 `lib/gallery.ts`, which is the single manifest both the wall and the grid read;
 copy from there rather than re-deriving them.
+
+# Two languages
+
+The site is written twice: English and Serbian (latinica). English is primary
+and **unprefixed** — `/`, `/about`, `/gallery` — so every URL the site has ever
+had still resolves and every visitor lands on English. Serbian lives under
+`/sr`.
+
+**Every route lives once, under `app/[lang]`.** `proxy.ts` rewrites the
+unprefixed paths onto the English branch, so the two languages cannot drift
+into two different site structures. It is a *rewrite*, not a redirect: the
+visitor's URL is left alone and there is no hop before the first paint.
+`/en/...` is redirected back to the unprefixed form, so there is exactly one
+URL per page and nothing to split search rankings.
+
+**Copy stays in the section that renders it.** Each file keeps a `COPY` object
+with an `en` and an `sr` branch at the top and reads `COPY[lang]`. The
+alternative — one central dictionary keyed by dotted strings — would put every
+sentence a long way from its markup, and the section is still the unit we
+iterate on. Values are `ReactNode` wherever a heading carries an `<Accent>`.
+Anything appearing in more than one section is a `Copy<T>` in `lib/site.ts`
+(`RESERVE_CTA`, `TAGLINE`, `SHARED`, `navigation`) — same rule as every other
+shared value.
+
+**Routes are structure, not copy.** Hrefs are written unprefixed and in their
+English form everywhere; `localePath(href, lang)` adds the prefix. There is no
+second set of Serbian slugs to keep in step.
+
+`localePath` has one case that is easy to get wrong. The nav writes its in-page
+links root-relative (`/#residence`) so they still work from a standalone page,
+and prefixing that naively gives `/sr/#residence` — a *different path* from
+`/sr`, which the browser treats as a navigation rather than a jump within the
+document. The Serbian landing page would reload, replay the loading curtain and
+lose the smooth scroll the English one keeps. It joins without the slash
+instead, giving `/sr#residence`. If you add a link shape, check it against
+both editions.
+
+**The switch shows both languages, always**, rather than hiding behind a
+dropdown, and it links to *the same page* in the other language — a reader who
+has scrolled to the gallery wants the gallery, in Serbian. It strips any
+prefix from `usePathname()` before rebuilding, so it does not matter whether
+the router reports the browser URL or the rewritten one. Below `md` it lives
+only in the mobile menu.
+
+**Every page carries `alternates()`** from `lib/metadata.ts`: a canonical for
+the edition being rendered plus the `hreflang` pair and `x-default` (English).
+A page that sets its own `openGraph` must localise `url` too — the layout's is
+the one for `/` and `/sr`.
+
+**Not translated, deliberately:** the address (written the way the post office
+and a maps app need it), email addresses, the brand name, and `/styleguide`,
+which is an internal noindex page.
 
 # Theme notes
 
@@ -132,7 +189,8 @@ curtain so the paper texture is there from the first frame.
 
 # Landing page
 
-`app/page.tsx` composes the sections in order and holds no markup of its own.
+`app/[lang]/page.tsx` composes the sections in order and holds no markup of
+its own.
 Each section owns its copy inline rather than importing from a content file:
 with this much text, colocation reads better than indirection, and a section is
 the unit we iterate on.
@@ -193,7 +251,8 @@ client navigation and does not replay the loading curtain, while fragments stay
 plain anchors, because the App Router forces an instant jump on hash navigation
 and would throw away `scroll-behavior: smooth`.
 
-**The about page is a reading page with a media rhythm.** `app/about/page.tsx`
+**The about page is a reading page with a media rhythm.**
+`app/[lang]/about/page.tsx`
 holds the copy in `SECTIONS` and composes the five parts explicitly rather than
 in a loop, because each one carries a different treatment: split row, dark
 summary plate, image pair, photo strip, full-bleed band, three-up grid. That

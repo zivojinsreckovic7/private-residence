@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { notFound } from "next/navigation";
 import { Reveal } from "@/components/motion/reveal";
 import { ContactForm } from "@/components/sections/contact-form";
 import { Container } from "@/components/ui/container";
@@ -6,12 +7,49 @@ import { Eyebrow } from "@/components/ui/eyebrow";
 import { FindUs } from "@/components/sections/find-us";
 import { Accent, Heading } from "@/components/ui/heading";
 import { Section } from "@/components/ui/section";
-import { site } from "@/lib/site";
+import { isLang } from "@/lib/i18n";
+import { alternates } from "@/lib/metadata";
+import { SHARED, site } from "@/lib/site";
 
-export const metadata: Metadata = {
-  title: "Contact",
-  description: `Enquire about dates, rates and availability at ${site.fullName}.`,
-};
+const COPY = {
+  en: {
+    title: "Contact",
+    description: `Enquire about dates, rates and availability at ${site.fullName}.`,
+    eyebrow: "Contact",
+    heading: (
+      <>
+        Get in <Accent>Touch</Accent>
+      </>
+    ),
+    lead: "Tell us your dates and who is travelling with you. Every enquiry is read and answered by our team, usually within 24 hours.",
+    direct: "Or reach us directly",
+  },
+  sr: {
+    title: "Kontakt",
+    description: `Pošaljite upit o datumima, cenama i dostupnosti u rezidenciji ${site.fullName}.`,
+    eyebrow: "Kontakt",
+    heading: (
+      <>
+        Javite <Accent>nam se</Accent>
+      </>
+    ),
+    lead: "Recite nam svoje datume i ko putuje sa vama. Svaki upit naš tim pročita i na njega odgovori, obično u roku od 24 sata.",
+    direct: "Ili nam se obratite direktno",
+  },
+} as const;
+
+export async function generateMetadata({
+  params,
+}: PageProps<"/[lang]/contact">): Promise<Metadata> {
+  const { lang } = await params;
+  if (!isLang(lang)) notFound();
+
+  return {
+    title: COPY[lang].title,
+    description: COPY[lang].description,
+    alternates: alternates("/contact", lang),
+  };
+}
 
 /**
  * The contact page is a utility page, so it is built as one: a heading, the
@@ -19,23 +57,30 @@ export const metadata: Metadata = {
  * scenes and no photography. The premium comes from the type, the spacing and
  * the hairlines the rest of the site already uses.
  */
-export default function ContactPage() {
+export default async function ContactPage({
+  params,
+}: PageProps<"/[lang]/contact">) {
+  const { lang } = await params;
+  if (!isLang(lang)) notFound();
+
+  const t = COPY[lang];
+  const shared = SHARED[lang];
+
   return (
     <>
       <Section tone="canvas" className="pt-40 pb-14 md:pt-52 md:pb-16">
         <Container>
           <Reveal variant="still">
-            <Eyebrow>Contact</Eyebrow>
+            <Eyebrow>{t.eyebrow}</Eyebrow>
           </Reveal>
           <Reveal variant="drape" className="mt-5">
             <Heading as="h1" size="display" className="max-w-[13ch]">
-              Get in <Accent>Touch</Accent>
+              {t.heading}
             </Heading>
           </Reveal>
           <Reveal delay={90}>
             <p className="text-lead mt-7 max-w-[54ch] text-ink-muted">
-              Tell us your dates and who is travelling with you. Every enquiry
-              is read and answered by our team, usually within 24 hours.
+              {t.lead}
             </p>
           </Reveal>
         </Container>
@@ -44,19 +89,19 @@ export default function ContactPage() {
       <Section id="contact" tone="surface" className="py-16 md:py-24">
         <Container className="grid items-start gap-12 lg:grid-cols-[1.15fr_0.85fr] lg:gap-20">
           <Reveal>
-            <ContactForm />
+            <ContactForm lang={lang} />
           </Reveal>
 
           <Reveal delay={120} as="section" className="lg:sticky lg:top-28">
             <h2 className="text-title font-serif font-light text-ink">
-              Or reach us directly
+              {t.direct}
             </h2>
 
             <dl className="mt-8">
-              <Detail label="Reservations">
+              <Detail label={shared.reservations}>
                 <MailLink address={site.contact.reservations} />
               </Detail>
-              <Detail label="General Enquiries">
+              <Detail label={shared.general}>
                 <MailLink address={site.contact.general} />
               </Detail>
               <Detail label="Instagram">
@@ -67,7 +112,7 @@ export default function ContactPage() {
                   @misprivateresidence
                 </a>
               </Detail>
-              <Detail label="The Residence">
+              <Detail label={shared.residence}>
                 <address className="text-body not-italic text-ink">
                   {site.address.lines.map((line) => (
                     <span key={line} className="block">
@@ -81,7 +126,7 @@ export default function ContactPage() {
         </Container>
       </Section>
 
-      <FindUs tone="canvas" />
+      <FindUs lang={lang} tone="canvas" />
     </>
   );
 }

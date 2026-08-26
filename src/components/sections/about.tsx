@@ -2,57 +2,117 @@ import { Reveal, RevealLines } from "@/components/motion/reveal";
 import { Container } from "@/components/ui/container";
 import { Accent, Heading } from "@/components/ui/heading";
 import { Section } from "@/components/ui/section";
+import type { Lang } from "@/lib/i18n";
 
-const ABOUT = [
-  "The most memorable luxury feels effortless.",
-  "It can be found in the space around you. In the privacy you have. In architecture that feels considered rather than excessive.",
-  "In being able to spend an entire day without needing anything beyond what is already around you.",
-  "Every part of the residence contributes to that experience.",
-] as const;
+const COPY = {
+  en: {
+    opening: "MIS Private Residence was created around a simple idea.",
+    about: [
+      "The most memorable luxury feels effortless.",
+      "It can be found in the space around you. In the privacy you have. In architecture that feels considered rather than excessive.",
+      "In being able to spend an entire day without needing anything beyond what is already around you.",
+      "Every part of the residence contributes to that experience.",
+    ],
+    retreat:
+      "A private Cyprus retreat designed not simply to be visited, but to be remembered.",
+    noise: (
+      <>
+        Luxury Without the <Accent>Noise</Accent>
+      </>
+    ),
+    noiseLead:
+      "We believe the best residences do not need to constantly remind you that they are luxurious.",
+    philosophy: [
+      "You notice it in the details.",
+      "In the materials.",
+      "In the light.",
+      "In the way spaces connect.",
+      "In how effortless everything feels.",
+    ],
+    privacy:
+      "And most importantly, in the privacy to experience it all entirely your way.",
+    entirely: (
+      <>
+        Entirely <Accent>Yours</Accent>
+      </>
+    ),
+    absences: [
+      "No hotel corridors.",
+      "No shared pool.",
+      "No strangers at breakfast.",
+      "No crowded common spaces.",
+    ],
+    rare: "MIS Private Residence offers something increasingly rare. Space that is truly your own.",
+    yours: ["Your people.", "Your plans.", "Your pace.", "Your residence."],
+  },
+  sr: {
+    opening: "MIS Private Residence nastala je oko jedne jednostavne ideje.",
+    about: [
+      "Najupečatljiviji luksuz deluje neusiljeno.",
+      "Nalazi se u prostoru oko vas. U privatnosti koju imate. U arhitekturi koja deluje promišljeno, a ne preterano.",
+      "U tome da ceo dan provedete a da vam ne zatreba ništa osim onoga što je već oko vas.",
+      "Svaki deo rezidencije doprinosi tom doživljaju.",
+    ],
+    retreat:
+      "Privatno utočište na Kipru, osmišljeno ne da se samo poseti, već da se pamti.",
+    noise: (
+      <>
+        Luksuz bez <Accent>buke</Accent>
+      </>
+    ),
+    noiseLead:
+      "Verujemo da najbolje rezidencije ne moraju stalno da vas podsećaju na to koliko su luksuzne.",
+    philosophy: [
+      "Primetićete to u detaljima.",
+      "U materijalima.",
+      "U svetlosti.",
+      "U načinu na koji se prostori povezuju.",
+      "U tome koliko sve deluje neusiljeno.",
+    ],
+    privacy:
+      "I, što je najvažnije, u privatnosti da sve to doživite potpuno na svoj način.",
+    entirely: (
+      <>
+        Potpuno <Accent>vaše</Accent>
+      </>
+    ),
+    absences: [
+      "Bez hotelskih hodnika.",
+      "Bez zajedničkog bazena.",
+      "Bez nepoznatih ljudi za doručkom.",
+      "Bez prepunih zajedničkih prostora.",
+    ],
+    rare: "MIS Private Residence nudi nešto sve ređe. Prostor koji je zaista samo vaš.",
+    yours: ["Vaši ljudi.", "Vaši planovi.", "Vaš tempo.", "Vaša rezidencija."],
+  },
+} as const;
 
-const PHILOSOPHY = [
-  "You notice it in the details.",
-  "In the materials.",
-  "In the light.",
-  "In the way spaces connect.",
-  "In how effortless everything feels.",
-] as const;
+export function About({ lang }: { lang: Lang }) {
+  const t = COPY[lang];
 
-const ABSENCES = [
-  "No hotel corridors.",
-  "No shared pool.",
-  "No strangers at breakfast.",
-  "No crowded common spaces.",
-] as const;
-
-const YOURS = ["Your people.", "Your plans.", "Your pace.", "Your residence."] as const;
-
-export function About() {
   return (
     <>
       <Section id="about" tone="surface" className="py-32 md:py-44">
         <Container className="grid gap-16 lg:grid-cols-12">
           <Reveal variant="drape" className="lg:col-span-5">
+            {/* The brand name is the brand name in both languages. */}
             <Heading size="display" className="max-w-[10ch]">
               MIS Private <Accent>Residence</Accent>
             </Heading>
           </Reveal>
           <div className="lg:col-span-6 lg:col-start-7">
             <Reveal delay={80}>
-              <p className="font-serif text-title text-ink">
-                MIS Private Residence was created around a simple idea.
-              </p>
+              <p className="font-serif text-title text-ink">{t.opening}</p>
             </Reveal>
             <RevealLines
               step={90}
               className="text-lead mt-8 space-y-5 text-ink-muted"
             >
-              {ABOUT}
+              {t.about}
             </RevealLines>
             <Reveal delay={480}>
               <p className="font-serif text-title mt-10 max-w-[36ch] text-ink">
-                A private Cyprus retreat designed not simply to be visited, but
-                to be remembered.
+                {t.retreat}
               </p>
             </Reveal>
           </div>
@@ -63,17 +123,14 @@ export function About() {
         <Container>
           <Reveal variant="drape">
             <Heading size="display" className="max-w-[14ch]">
-              Luxury Without the <Accent>Noise</Accent>
+              {t.noise}
             </Heading>
           </Reveal>
           <Reveal delay={100} className="mt-12 max-w-[54ch]">
-            <p className="text-lead text-ink-muted">
-              We believe the best residences do not need to constantly remind
-              you that they are luxurious.
-            </p>
+            <p className="text-lead text-ink-muted">{t.noiseLead}</p>
           </Reveal>
           <ul className="mt-16 grid gap-x-16 gap-y-4 sm:grid-cols-2">
-            {PHILOSOPHY.map((line, i) => (
+            {t.philosophy.map((line, i) => (
               <Reveal as="li" key={line} delay={i * 90}>
                 <span className="font-serif text-title font-light text-ink">
                   {line}
@@ -83,8 +140,7 @@ export function About() {
           </ul>
           <Reveal delay={520}>
             <p className="text-lead mt-16 max-w-[52ch] text-ink-muted">
-              And most importantly, in the privacy to experience it all entirely
-              your way.
+              {t.privacy}
             </p>
           </Reveal>
         </Container>
@@ -95,13 +151,13 @@ export function About() {
         <Container>
           <Reveal variant="drape">
             <Heading size="mega" className="max-w-[14ch] text-on-dark">
-              Entirely <Accent>Yours</Accent>
+              {t.entirely}
             </Heading>
           </Reveal>
 
           <div className="mt-24 grid gap-16 lg:grid-cols-12">
             <ul className="lg:col-span-4">
-              {ABSENCES.map((line, i) => (
+              {t.absences.map((line, i) => (
                 <Reveal
                   as="li"
                   key={line}
@@ -116,12 +172,11 @@ export function About() {
             <div className="lg:col-span-6 lg:col-start-7">
               <Reveal delay={200}>
                 <p className="text-lead max-w-[42ch] text-on-dark/85">
-                  MIS Private Residence offers something increasingly rare.
-                  Space that is truly your own.
+                  {t.rare}
                 </p>
               </Reveal>
               <ul className="mt-12 space-y-2">
-                {YOURS.map((line, i) => (
+                {t.yours.map((line, i) => (
                   <Reveal as="li" key={line} delay={300 + i * 110}>
                     <span className="font-serif text-display font-light text-on-dark">
                       {line}

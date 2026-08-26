@@ -3,6 +3,7 @@ import { Reveal } from "@/components/motion/reveal";
 import { Button } from "@/components/ui/button";
 import { Container } from "@/components/ui/container";
 import { Section } from "@/components/ui/section";
+import { localePath, type Lang } from "@/lib/i18n";
 import { RESERVE_CTA } from "@/lib/site";
 
 /**
@@ -22,10 +23,18 @@ import { RESERVE_CTA } from "@/lib/site";
  *   so do not "correct" it back to `rounded-surface`.
  *
  * The copy follows whatever section it sits under, so each placement in
- * `app/page.tsx` carries its own line. Only the label is fixed: `RESERVE_CTA`
- * is the single booking label.
+ * `app/[lang]/page.tsx` carries its own line, in both languages. Only the
+ * label is fixed: `RESERVE_CTA` is the single booking label.
  */
-export function CtaBanner({ line, note }: { line: string; note: string }) {
+export function CtaBanner({
+  lang,
+  line,
+  note,
+}: {
+  lang: Lang;
+  line: string;
+  note: string;
+}) {
   return (
     <Section tone="surface" space="none" className="py-16 md:py-24">
       <Container>
@@ -38,8 +47,8 @@ export function CtaBanner({ line, note }: { line: string; note: string }) {
               {note}
             </p>
             <Magnetic className="mt-10 inline-block">
-              <Button href="/contact" size="lg" icon>
-                {RESERVE_CTA}
+              <Button href={localePath("/contact", lang)} size="lg" icon>
+                {RESERVE_CTA[lang]}
               </Button>
             </Magnetic>
           </div>

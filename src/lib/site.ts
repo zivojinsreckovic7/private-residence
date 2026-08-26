@@ -1,11 +1,16 @@
+import type { Copy, Lang } from "@/lib/i18n";
+
 /**
  * Single source of truth for brand facts. Anything that appears in more than
  * one place on the site belongs here, not inline in a component.
+ *
+ * Facts are language-neutral and live in `site`. Anything with wording in it —
+ * the tagline, the nav labels, the booking label — is a `Copy` and is read
+ * through the small helpers at the foot of this file.
  */
 export const site = {
   name: "MIS",
   fullName: "MIS Private Residence",
-  tagline: "Private luxury living in Cyprus.",
   location: "Cyprus",
   url: "https://www.misprivateresidence.com",
   contact: {
@@ -17,6 +22,9 @@ export const site = {
    * The residence's address. `lines` is the postal form, written the way it
    * would be on an envelope; the flat fields underneath are the same address
    * for schema.org, which wants it broken up. Keep the two in step.
+   *
+   * The address is not translated. It is written the way the post office and
+   * a maps app need it, in both languages.
    */
   address: {
     lines: [
@@ -41,11 +49,28 @@ export const site = {
   },
 } as const;
 
-/** The one label for the booking intent. Used in the nav, hero, and footer. */
-export const RESERVE_CTA = "Reserve Your Stay";
+/** The line under the wordmark in the footer, and the site's meta description. */
+export const TAGLINE: Copy<string> = {
+  en: "Private luxury living in Cyprus.",
+  sr: "Privatan luksuz na Kipru.",
+};
+
+/**
+ * The one label for the booking intent. Used in the nav, hero, reservations
+ * and the final CTA.
+ */
+export const RESERVE_CTA: Copy<string> = {
+  en: "Reserve Your Stay",
+  sr: "Rezervišite boravak",
+};
 
 /**
  * Primary navigation. Kept short so the nav stays on one line at desktop.
+ *
+ * Hrefs are written unprefixed and in the English form: they are the site's
+ * route structure, not copy. `localePath()` adds the `/sr` prefix where it is
+ * needed, so the Serbian edition uses the same routes rather than a second set
+ * of slugs to keep in step.
  *
  * The section links are root-relative (`/#residence`, not `#residence`) so the
  * nav still works from the standalone pages, where a bare fragment would have
@@ -53,16 +78,54 @@ export const RESERVE_CTA = "Reserve Your Stay";
  * them as same-document jumps, so smooth scrolling is unaffected.
  */
 export const navigation = [
-  { label: "Residence", href: "/#residence" },
-  { label: "Experience", href: "/experiences" },
-  { label: "Cyprus", href: "/#cyprus" },
-  { label: "Gallery", href: "/gallery" },
-  { label: "About", href: "/about" },
-  { label: "Contact", href: "/contact" },
+  { href: "/#residence", label: { en: "Residence", sr: "Rezidencija" } },
+  { href: "/experiences", label: { en: "Experience", sr: "Doživljaj" } },
+  { href: "/#cyprus", label: { en: "Cyprus", sr: "Kipar" } },
+  { href: "/gallery", label: { en: "Gallery", sr: "Galerija" } },
+  { href: "/about", label: { en: "About", sr: "O nama" } },
+  { href: "/contact", label: { en: "Contact", sr: "Kontakt" } },
 ] as const;
 
 export const legalLinks = [
-  { label: "Privacy Policy", href: "/privacy" },
-  { label: "Terms & Conditions", href: "/terms" },
-  { label: "Reservation Terms", href: "/reservation-terms" },
+  { href: "/privacy", label: { en: "Privacy Policy", sr: "Politika privatnosti" } },
+  { href: "/terms", label: { en: "Terms & Conditions", sr: "Uslovi korišćenja" } },
+  {
+    href: "/reservation-terms",
+    label: { en: "Reservation Terms", sr: "Uslovi rezervacije" },
+  },
 ] as const;
+
+/** Labels that appear in the chrome and in more than one section. */
+export const SHARED: Copy<{
+  reservations: string;
+  general: string;
+  residence: string;
+  address: string;
+  openInMaps: string;
+  copyright: (year: number) => string;
+}> = {
+  en: {
+    reservations: "Reservations",
+    general: "General Enquiries",
+    residence: "The Residence",
+    address: "Address",
+    openInMaps: "Open in Google Maps",
+    copyright: (year) => `© ${year} ${site.fullName}. All rights reserved.`,
+  },
+  sr: {
+    reservations: "Rezervacije",
+    general: "Opšte informacije",
+    residence: "Rezidencija",
+    address: "Adresa",
+    openInMaps: "Otvorite u Google mapama",
+    copyright: (year) =>
+      `© ${year} ${site.fullName}. Sva prava zadržana.`,
+  },
+};
+
+/** The site name as it reads in a title, per language. */
+export function siteTitle(lang: Lang) {
+  return lang === "sr"
+    ? `${site.fullName}, Kipar`
+    : `${site.fullName}, ${site.location}`;
+}

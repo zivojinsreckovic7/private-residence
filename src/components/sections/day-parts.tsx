@@ -6,15 +6,17 @@ import { MotionValue, motion, useScroll, useTransform } from "motion/react";
 import { Container } from "@/components/ui/container";
 import { ramp, window01 } from "@/lib/ramp";
 import { Accent, Heading } from "@/components/ui/heading";
+import type { Copy, Lang } from "@/lib/i18n";
 
 type Part = {
   id: string;
-  label: string;
-  heading: string;
-  accent: string;
+  label: Copy<string>;
+  /** The heading's opening words, and the one word set in <Accent>. */
+  heading: Copy<string>;
+  accent: Copy<string>;
   image: string;
-  alt: string;
-  lines: readonly string[];
+  alt: Copy<string>;
+  lines: Copy<readonly string[]>;
   /** Progress window in which this chapter is fully legible. */
   window: readonly [number, number];
 };
@@ -22,47 +24,80 @@ type Part = {
 const PARTS: readonly Part[] = [
   {
     id: "morning",
-    label: "Morning",
-    heading: "Mornings, ",
-    accent: "Unhurried",
+    label: { en: "Morning", sr: "Jutro" },
+    heading: { en: "Mornings, ", sr: "Jutra bez " },
+    accent: { en: "Unhurried", sr: "žurbe" },
     image: "/gallery/details/outdoor-dining-through-foliage.jpeg",
-    alt: "The outdoor dining table seen through foliage in the morning.",
-    lines: [
-      "The best days here start slowly.",
-      "Natural light fills the residence as Cyprus wakes around you.",
-      "Coffee outside. A quiet swim. Breakfast beneath the morning sun.",
-      "No alarms. No schedule. No reason to be anywhere else.",
-    ],
+    alt: {
+      en: "The outdoor dining table seen through foliage in the morning.",
+      sr: "Spoljni trpezarijski sto viđen kroz zelenilo u jutarnjim satima.",
+    },
+    lines: {
+      en: [
+        "The best days here start slowly.",
+        "Natural light fills the residence as Cyprus wakes around you.",
+        "Coffee outside. A quiet swim. Breakfast beneath the morning sun.",
+        "No alarms. No schedule. No reason to be anywhere else.",
+      ],
+      sr: [
+        "Najbolji dani ovde počinju polako.",
+        "Prirodna svetlost ispunjava rezidenciju dok se Kipar budi oko vas.",
+        "Kafa napolju. Mirno plivanje. Doručak pod jutarnjim suncem.",
+        "Bez budilnika. Bez rasporeda. Bez razloga da budete bilo gde drugde.",
+      ],
+    },
     window: [0, 0.3],
   },
   {
     id: "day",
-    label: "Day",
-    heading: "Days Without a ",
-    accent: "Schedule",
+    label: { en: "Day", sr: "Dan" },
+    heading: { en: "Days Without a ", sr: "Dani bez " },
+    accent: { en: "Schedule", sr: "rasporeda" },
     image: "/gallery/pool-terrace/pool-from-covered-lounge.jpeg",
-    alt: "The pool seen from the shade of the covered lounge.",
-    lines: [
-      "Move effortlessly between the residence and its outdoor spaces.",
-      "Swim. Read. Share lunch.",
-      "Spend hours beneath the Mediterranean sun, then disappear inside for an afternoon rest.",
-      "Sometimes the most valuable part of a stay is having absolutely nowhere you need to be.",
-    ],
+    alt: {
+      en: "The pool seen from the shade of the covered lounge.",
+      sr: "Bazen viđen iz hlada natkrivenog salona.",
+    },
+    lines: {
+      en: [
+        "Move effortlessly between the residence and its outdoor spaces.",
+        "Swim. Read. Share lunch.",
+        "Spend hours beneath the Mediterranean sun, then disappear inside for an afternoon rest.",
+        "Sometimes the most valuable part of a stay is having absolutely nowhere you need to be.",
+      ],
+      sr: [
+        "Krećite se bez napora između rezidencije i njenih spoljnih prostora.",
+        "Plivajte. Čitajte. Ručajte zajedno.",
+        "Provedite sate pod mediteranskim suncem, a zatim se povucite unutra na popodnevni odmor.",
+        "Ponekad je najdragoceniji deo boravka to što ne morate da budete baš nigde.",
+      ],
+    },
     window: [0.37, 0.63],
   },
   {
     id: "evening",
-    label: "Evening",
-    heading: "Stay for ",
-    accent: "Sunset",
+    label: { en: "Evening", sr: "Veče" },
+    heading: { en: "Stay for ", sr: "Ostanite zbog " },
+    accent: { en: "Sunset", sr: "zalaska" },
     image: "/gallery/pool-terrace/pool-outdoor-cinema-screen.jpeg",
-    alt: "The outdoor cinema screen standing beside the pool at dusk.",
-    lines: [
-      "As the sun begins to disappear, the atmosphere changes.",
-      "Warm light moves across the architecture. The pool reflects the evening sky.",
-      "Dinner moves outside. Conversations last longer.",
-      "This is Cyprus after dark, experienced entirely your way.",
-    ],
+    alt: {
+      en: "The outdoor cinema screen standing beside the pool at dusk.",
+      sr: "Platno bioskopa na otvorenom pored bazena u sumrak.",
+    },
+    lines: {
+      en: [
+        "As the sun begins to disappear, the atmosphere changes.",
+        "Warm light moves across the architecture. The pool reflects the evening sky.",
+        "Dinner moves outside. Conversations last longer.",
+        "This is Cyprus after dark, experienced entirely your way.",
+      ],
+      sr: [
+        "Kako sunce počinje da nestaje, atmosfera se menja.",
+        "Topla svetlost prelazi preko arhitekture. Bazen odražava večernje nebo.",
+        "Večera se seli napolje. Razgovori traju duže.",
+        "To je Kipar posle mraka, doživljen potpuno na vaš način.",
+      ],
+    },
     window: [0.7, 1],
   },
 ];
@@ -86,7 +121,7 @@ const FADE = 0.07;
  * paragraphs. Only opacity changes, so nothing here is hidden from search or
  * from a screen reader.
  */
-export function DayParts() {
+export function DayParts({ lang }: { lang: Lang }) {
   const ref = useRef<HTMLElement>(null);
   const { scrollYProgress } = useScroll({
     target: ref,
@@ -102,10 +137,15 @@ export function DayParts() {
     >
       <div className="sticky top-0 h-dvh overflow-clip motion-reduce:static motion-reduce:h-auto">
         {PARTS.map((part) => (
-          <Chapter key={part.id} part={part} progress={scrollYProgress} />
+          <Chapter
+            key={part.id}
+            part={part}
+            lang={lang}
+            progress={scrollYProgress}
+          />
         ))}
 
-        <ChapterIndex progress={scrollYProgress} />
+        <ChapterIndex lang={lang} progress={scrollYProgress} />
       </div>
     </section>
   );
@@ -113,9 +153,11 @@ export function DayParts() {
 
 function Chapter({
   part,
+  lang,
   progress,
 }: {
   part: Part;
+  lang: Lang;
   progress: MotionValue<number>;
 }) {
   const [from, to] = part.window;
@@ -134,7 +176,7 @@ function Chapter({
       >
         <Image
           src={part.image}
-          alt={part.alt}
+          alt={part.alt[lang]}
           fill
           sizes="100vw"
           className="object-cover"
@@ -149,11 +191,11 @@ function Chapter({
       <Container className="relative">
         <motion.div style={{ y: typeY }} className="max-w-[46ch]">
           <Heading size="display" className="text-on-dark">
-            {part.heading}
-            <Accent>{part.accent}</Accent>
+            {part.heading[lang]}
+            <Accent>{part.accent[lang]}</Accent>
           </Heading>
           <div className="text-lead mt-8 space-y-4 text-on-dark/80">
-            {part.lines.map((line) => (
+            {part.lines[lang].map((line) => (
               <p key={line}>{line}</p>
             ))}
           </div>
@@ -168,11 +210,22 @@ function Chapter({
  * holds still while its contents change, so the reader can see where in the
  * day they are.
  */
-function ChapterIndex({ progress }: { progress: MotionValue<number> }) {
+function ChapterIndex({
+  lang,
+  progress,
+}: {
+  lang: Lang;
+  progress: MotionValue<number>;
+}) {
   return (
     <div className="absolute right-8 bottom-0 top-0 z-10 hidden flex-col items-center justify-center gap-10 lg:flex motion-reduce:hidden">
       {PARTS.map((part) => (
-        <IndexLabel key={part.id} part={part} progress={progress} />
+        <IndexLabel
+          key={part.id}
+          part={part}
+          lang={lang}
+          progress={progress}
+        />
       ))}
     </div>
   );
@@ -180,9 +233,11 @@ function ChapterIndex({ progress }: { progress: MotionValue<number> }) {
 
 function IndexLabel({
   part,
+  lang,
   progress,
 }: {
   part: Part;
+  lang: Lang;
   progress: MotionValue<number>;
 }) {
   const [from, to] = part.window;
@@ -200,7 +255,7 @@ function IndexLabel({
         style={{ scaleY: rule }}
         className="h-8 w-px origin-center bg-accent-bright"
       />
-      {part.label}
+      {part.label[lang]}
     </motion.span>
   );
 }

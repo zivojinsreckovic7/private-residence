@@ -6,6 +6,34 @@ import { motion, useScroll, useTransform } from "motion/react";
 import { Container } from "@/components/ui/container";
 import { window01 } from "@/lib/ramp";
 import type { PhotoGroup } from "@/lib/gallery";
+import type { Lang } from "@/lib/i18n";
+
+/**
+ * Serbian counts in three forms, so the rail's caption goes through
+ * `Intl.PluralRules` rather than a hand-written rule: the count comes from the
+ * manifest, and a set that shrinks to three photographs must not print
+ * "3 fotografija".
+ */
+const SR_PHOTOGRAPHS: Record<Intl.LDMLPluralRule, string> = {
+  zero: "fotografija",
+  one: "fotografija",
+  two: "fotografije",
+  few: "fotografije",
+  many: "fotografija",
+  other: "fotografija",
+};
+
+const COPY = {
+  en: {
+    region: "Residence photographs",
+    count: (n: number) => `${n} photographs`,
+  },
+  sr: {
+    region: "Fotografije rezidencije",
+    count: (n: number) =>
+      `${n} ${SR_PHOTOGRAPHS[new Intl.PluralRules("sr").select(n)]}`,
+  },
+} as const;
 
 /** Track geometry, in viewport widths. */
 const GAP = 1.5;
@@ -44,7 +72,14 @@ const SHAPES = [
  * costs a lot of vertical scroll for a gesture the device already does better,
  * so the mobile version keeps the idea and drops the mechanism.
  */
-export function GalleryWall({ groups }: { groups: readonly PhotoGroup[] }) {
+export function GalleryWall({
+  lang,
+  groups,
+}: {
+  lang: Lang;
+  groups: readonly PhotoGroup[];
+}) {
+  const t = COPY[lang];
   const ref = useRef<HTMLElement>(null);
   const { scrollYProgress } = useScroll({
     target: ref,
@@ -95,7 +130,7 @@ export function GalleryWall({ groups }: { groups: readonly PhotoGroup[] }) {
     <>
       <section
         ref={ref}
-        aria-label="Residence photographs"
+        aria-label={t.region}
         style={{ "--scene": `${sceneVh}vh` } as React.CSSProperties}
         className="relative hidden h-[var(--scene)] bg-canvas lg:block motion-reduce:h-auto"
       >
@@ -139,7 +174,7 @@ export function GalleryWall({ groups }: { groups: readonly PhotoGroup[] }) {
 
               <div className="hidden w-[38%] items-center gap-4 sm:flex">
                 <span className="text-label uppercase text-ink-subtle">
-                  {placed.length} photographs
+                  {t.count(placed.length)}
                 </span>
                 <span className="relative h-px flex-1 bg-line">
                   <motion.span

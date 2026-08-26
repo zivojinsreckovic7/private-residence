@@ -7,54 +7,102 @@ import { Button } from "@/components/ui/button";
 import { Container } from "@/components/ui/container";
 import { Accent, Heading } from "@/components/ui/heading";
 import { Reveal } from "@/components/motion/reveal";
+import { localePath, type Lang } from "@/lib/i18n";
+
+const COPY = {
+  en: {
+    title: (
+      <>
+        See the <Accent>Residence</Accent>
+      </>
+    ),
+    lead: "Architecture can be described. Atmosphere needs to be seen.",
+    region: "Gallery",
+    cta: "View Full Gallery",
+  },
+  sr: {
+    title: (
+      <>
+        Pogledajte <Accent>rezidenciju</Accent>
+      </>
+    ),
+    lead: "Arhitektura se može opisati. Atmosfera se mora videti.",
+    region: "Galerija",
+    cta: "Pogledajte celu galeriju",
+  },
+} as const;
 
 const FRAMES = [
   {
-    label: "Residence",
+    label: { en: "Residence", sr: "Rezidencija" },
     src: "/gallery/exterior/villa-facade-from-pool.jpeg",
-    alt: "The villa facade seen across the pool.",
+    alt: {
+      en: "The villa facade seen across the pool.",
+      sr: "Fasada vile viđena preko bazena.",
+    },
     w: 30, dy: 0, aspect: "aspect-[4/5]",
   },
   {
-    label: "Interiors",
+    label: { en: "Interiors", sr: "Enterijeri" },
     src: "/gallery/living/living-room-and-staircase.jpeg",
-    alt: "The living room with the staircase behind it.",
+    alt: {
+      en: "The living room with the staircase behind it.",
+      sr: "Dnevna soba sa stepeništem u pozadini.",
+    },
     w: 40, dy: 7, aspect: "aspect-[4/3]",
   },
   {
-    label: "Pool",
+    label: { en: "Pool", sr: "Bazen" },
     src: "/gallery/pool-terrace/pool-through-bougainvillea.jpeg",
-    alt: "The pool framed by bougainvillea.",
+    alt: {
+      en: "The pool framed by bougainvillea.",
+      sr: "Bazen uokviren bugenvilijom.",
+    },
     w: 26, dy: -5, aspect: "aspect-[3/4]",
   },
   {
-    label: "Kitchen",
+    label: { en: "Kitchen", sr: "Kuhinja" },
     src: "/gallery/kitchen/kitchen-island-and-display-shelves.jpeg",
-    alt: "The kitchen island with display shelving behind it.",
+    alt: {
+      en: "The kitchen island with display shelving behind it.",
+      sr: "Kuhinjsko ostrvo sa policama u pozadini.",
+    },
     w: 34, dy: 4, aspect: "aspect-[4/5]",
   },
   {
-    label: "Outdoor Living",
+    label: { en: "Outdoor Living", sr: "Život na otvorenom" },
     src: "/gallery/pool-terrace/pool-terrace-lounge-and-dining.jpeg",
-    alt: "Lounge seating and a dining table on the pool terrace.",
+    alt: {
+      en: "Lounge seating and a dining table on the pool terrace.",
+      sr: "Sedeći deo i trpezarijski sto na terasi uz bazen.",
+    },
     w: 44, dy: -6, aspect: "aspect-[16/10]",
   },
   {
-    label: "Bedrooms",
+    label: { en: "Bedrooms", sr: "Spavaće sobe" },
     src: "/gallery/bedrooms/twin-bedroom-with-balcony.jpeg",
-    alt: "A twin bedroom opening onto its own balcony.",
+    alt: {
+      en: "A twin bedroom opening onto its own balcony.",
+      sr: "Soba sa dva ležaja koja se otvara ka sopstvenom balkonu.",
+    },
     w: 28, dy: 6, aspect: "aspect-[3/4]",
   },
   {
-    label: "Details",
+    label: { en: "Details", sr: "Detalji" },
     src: "/gallery/details/poolside-table-juice-and-fruit.jpeg",
-    alt: "Juice and fruit laid out on a poolside table.",
+    alt: {
+      en: "Juice and fruit laid out on a poolside table.",
+      sr: "Sok i voće posluženi na stolu uz bazen.",
+    },
     w: 36, dy: -3, aspect: "aspect-[4/3]",
   },
   {
-    label: "Evenings",
+    label: { en: "Evenings", sr: "Večeri" },
     src: "/gallery/exterior/villa-facade-outdoor-cinema.jpeg",
-    alt: "The villa facade with the outdoor cinema set up in front of it.",
+    alt: {
+      en: "The villa facade with the outdoor cinema set up in front of it.",
+      sr: "Fasada vile sa bioskopom na otvorenom postavljenim ispred nje.",
+    },
     w: 30, dy: 5, aspect: "aspect-[4/5]",
   },
 ] as const;
@@ -84,7 +132,8 @@ const SCENE_VH = 270;
  * a phone costs a lot of vertical scroll for a gesture the device already does
  * better, so the mobile version keeps the idea and drops the mechanism.
  */
-export function Gallery() {
+export function Gallery({ lang }: { lang: Lang }) {
+  const t = COPY[lang];
   const ref = useRef<HTMLElement>(null);
   const { scrollYProgress } = useScroll({
     target: ref,
@@ -97,20 +146,18 @@ export function Gallery() {
       <Container className="pt-28 md:pt-40">
         <Reveal variant="drape">
           <Heading size="display" className="max-w-[14ch]">
-            See the <Accent>Residence</Accent>
+            {t.title}
           </Heading>
         </Reveal>
         <Reveal delay={90} className="mt-8 max-w-[52ch]">
-          <p className="text-lead text-ink-muted">
-            Architecture can be described. Atmosphere needs to be seen.
-          </p>
+          <p className="text-lead text-ink-muted">{t.lead}</p>
         </Reveal>
       </Container>
 
       {/* Desktop: vertical scroll drives the pan. */}
       <section
         ref={ref}
-        aria-label="Gallery"
+        aria-label={t.region}
         style={{ "--scene": `${SCENE_VH}vh` } as React.CSSProperties}
         className="relative mt-16 hidden h-[var(--scene)] lg:block motion-reduce:h-auto"
       >
@@ -128,7 +175,12 @@ export function Gallery() {
                 }}
                 className="shrink-0"
               >
-                <Frame {...frame} sizes={`${frame.w}vw`} />
+                <Frame
+                  {...frame}
+                  label={frame.label[lang]}
+                  alt={frame.alt[lang]}
+                  sizes={`${frame.w}vw`}
+                />
               </li>
             ))}
           </motion.ul>
@@ -139,15 +191,20 @@ export function Gallery() {
       <ul className="mt-12 flex snap-x snap-mandatory gap-4 overflow-x-auto px-5 pb-4 md:px-8 lg:hidden">
         {FRAMES.map((frame) => (
           <li key={frame.src} className="w-[78vw] shrink-0 snap-center">
-            <Frame {...frame} sizes="78vw" />
+            <Frame
+              {...frame}
+              label={frame.label[lang]}
+              alt={frame.alt[lang]}
+              sizes="78vw"
+            />
           </li>
         ))}
       </ul>
 
       <Container className="pt-10 pb-28 md:pb-40">
         <Reveal>
-          <Button href="/gallery" variant="outline" icon>
-            View Full Gallery
+          <Button href={localePath("/gallery", lang)} variant="outline" icon>
+            {t.cta}
           </Button>
         </Reveal>
       </Container>

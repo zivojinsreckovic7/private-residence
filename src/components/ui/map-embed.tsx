@@ -1,5 +1,13 @@
 import { cn } from "@/lib/cn";
+import type { Lang } from "@/lib/i18n";
 import { site } from "@/lib/site";
+
+const TITLE = {
+  en: (locality: string) =>
+    `Map showing the location of ${site.fullName} in ${locality}, Cyprus`,
+  sr: (locality: string) =>
+    `Mapa sa lokacijom rezidencije ${site.fullName} u mestu ${locality}, Kipar`,
+} as const;
 
 /**
  * The residence on a Google map.
@@ -10,7 +18,13 @@ import { site } from "@/lib/site";
  * invisible to a crawler and to anyone blocking third-party frames, so the
  * address is always set as text beside it. See `sections/find-us.tsx`.
  */
-export function MapEmbed({ className }: { className?: string }) {
+export function MapEmbed({
+  lang,
+  className,
+}: {
+  lang: Lang;
+  className?: string;
+}) {
   const { address } = site;
 
   return (
@@ -22,7 +36,7 @@ export function MapEmbed({ className }: { className?: string }) {
     >
       <iframe
         src={address.embedUrl}
-        title={`Map showing the location of ${site.fullName} in ${address.locality}, Cyprus`}
+        title={TITLE[lang](address.locality)}
         loading="lazy"
         allowFullScreen
         referrerPolicy="strict-origin-when-cross-origin"

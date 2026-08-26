@@ -1,12 +1,24 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
 import { AppLink } from "@/components/ui/app-link";
 import { Magnetic } from "@/components/motion/magnetic";
 import { Button } from "@/components/ui/button";
 import { Wordmark } from "@/components/ui/wordmark";
 import { cn } from "@/lib/cn";
+import { LANGS, LANG_NAMES, LANG_TAGS, localePath, type Lang } from "@/lib/i18n";
 import { RESERVE_CTA, navigation, site } from "@/lib/site";
+
+const COPY = {
+  en: { home: "home", open: "Open menu", close: "Close menu", language: "Language" },
+  sr: {
+    home: "početna",
+    open: "Otvorite meni",
+    close: "Zatvorite meni",
+    language: "Jezik",
+  },
+} as const;
 
 /**
  * Site header.
@@ -22,8 +34,9 @@ import { RESERVE_CTA, navigation, site } from "@/lib/site";
  *
  * z-index scale: mobile overlay 30, header 40, loading curtain 50, grain 60.
  */
-export function SiteHeader() {
+export function SiteHeader({ lang }: { lang: Lang }) {
   const [open, setOpen] = useState(false);
+  const t = COPY[lang];
 
   useEffect(() => {
     if (!open) return;
@@ -42,36 +55,45 @@ export function SiteHeader() {
         <div
           className={cn(
             "mx-4 mt-3 flex h-14 max-w-[1240px] items-center justify-between",
-            "gap-8 rounded-full px-3 pl-6 md:mx-8 md:mt-4",
+            "gap-4 rounded-full px-3 pl-6 md:mx-8 md:mt-4 xl:gap-8",
             "bg-canvas/80 shadow-soft ring-1 ring-line backdrop-blur-xl",
             "xl:mx-auto",
           )}
         >
           {/* Root, not `#top`: the mark has to return home from a standalone
               page, and on the landing page `/` still lands on the hero. */}
-          <AppLink href="/" aria-label={`${site.fullName}, home`}>
+          <AppLink
+            href={localePath("/", lang)}
+            aria-label={`${site.fullName}, ${t.home}`}
+          >
             <Wordmark />
           </AppLink>
 
-          <nav className="hidden items-center gap-8 lg:flex">
+          <nav className="hidden items-center gap-6 lg:flex xl:gap-8">
             {navigation.map((item) => (
-              <NavLink key={item.href} href={item.href}>
-                {item.label}
+              <NavLink key={item.href} href={localePath(item.href, lang)}>
+                {item.label[lang]}
               </NavLink>
             ))}
           </nav>
 
           <div className="flex items-center gap-2">
+            <LanguageSwitch
+              lang={lang}
+              label={t.language}
+              className="hidden md:flex"
+            />
+
             <Magnetic className="hidden sm:block">
-              <Button href="/contact" icon>
-                {RESERVE_CTA}
+              <Button href={localePath("/contact", lang)} icon>
+                {RESERVE_CTA[lang]}
               </Button>
             </Magnetic>
 
             <button
               type="button"
               onClick={() => setOpen((v) => !v)}
-              aria-label={open ? "Close menu" : "Open menu"}
+              aria-label={open ? t.close : t.open}
               aria-expanded={open}
               className="relative size-11 shrink-0 rounded-full text-ink lg:hidden"
             >
@@ -81,8 +103,64 @@ export function SiteHeader() {
         </div>
       </header>
 
-      <MobileMenu open={open} onClose={() => setOpen(false)} />
+      <MobileMenu lang={lang} open={open} onClose={() => setOpen(false)} />
     </>
+  );
+}
+
+/**
+ * The language switch: both languages always visible, the current one marked,
+ * rather than a dropdown that hides the fact the site is written twice.
+ *
+ * It links to the same page in the other language, not to that language's home
+ * page: a reader who has scrolled to the gallery wants the gallery, in
+ * Serbian. The path is stripped of any prefix before being rebuilt, so it does
+ * not matter whether the router reports the browser URL or the rewritten one.
+ */
+function LanguageSwitch({
+  lang,
+  label,
+  className,
+  onNavigate,
+}: {
+  lang: Lang;
+  label: string;
+  className?: string;
+  onNavigate?: () => void;
+}) {
+  const pathname = usePathname() ?? "/";
+  const bare = pathname.replace(/^\/(en|sr)(?=\/|$)/, "") || "/";
+
+  return (
+    <div
+      role="group"
+      aria-label={label}
+      className={cn("items-center gap-2 pr-1 pl-2 flex", className)}
+    >
+      {LANGS.map((code, i) => {
+        const current = code === lang;
+        return (
+          <span key={code} className="flex items-center gap-2">
+            {i > 0 && <span aria-hidden className="h-3 w-px bg-line-strong" />}
+            <AppLink
+              href={localePath(bare, code)}
+              hrefLang={LANG_TAGS[code]}
+              onClick={onNavigate}
+              aria-current={current ? "true" : undefined}
+              className={cn(
+                "text-label uppercase transition-colors duration-(--dur-fast)",
+                current
+                  ? "font-medium text-ink"
+                  : "text-ink-subtle hover:text-accent",
+              )}
+            >
+              <span className="sr-only">{LANG_NAMES[code].full}</span>
+              <span aria-hidden>{LANG_NAMES[code].short}</span>
+            </AppLink>
+          </span>
+        );
+      })}
+    </div>
   );
 }
 
@@ -128,7 +206,17 @@ function MenuLines({ open }: { open: boolean }) {
   );
 }
 
-function MobileMenu({ open, onClose }: { open: boolean; onClose: () => void }) {
+function MobileMenu({
+  lang,
+  open,
+  onClose,
+}: {
+  lang: Lang;
+  open: boolean;
+  onClose: () => void;
+}) {
+  const t = COPY[lang];
+
   return (
     <div
       className={cn(
@@ -141,7 +229,7 @@ function MobileMenu({ open, onClose }: { open: boolean; onClose: () => void }) {
           {navigation.map((item, i) => (
             <AppLink
               key={item.href}
-              href={item.href}
+              href={localePath(item.href, lang)}
               onClick={onClose}
               style={{ transitionDelay: open ? `${100 + i * 50}ms` : "0ms" }}
               className={cn(
@@ -149,7 +237,7 @@ function MobileMenu({ open, onClose }: { open: boolean; onClose: () => void }) {
                 open ? "translate-y-0 opacity-100" : "translate-y-10 opacity-0",
               )}
             >
-              {item.label}
+              {item.label[lang]}
             </AppLink>
           ))}
         </nav>
@@ -161,15 +249,29 @@ function MobileMenu({ open, onClose }: { open: boolean; onClose: () => void }) {
             open ? "translate-y-0 opacity-100" : "translate-y-8 opacity-0",
           )}
         >
-          <Button href="/contact" size="lg" icon onClick={onClose}>
-            {RESERVE_CTA}
-          </Button>
-          <a
-            href={`mailto:${site.contact.reservations}`}
-            className="text-meta mt-8 block text-ink-subtle"
+          <Button
+            href={localePath("/contact", lang)}
+            size="lg"
+            icon
+            onClick={onClose}
           >
-            {site.contact.reservations}
-          </a>
+            {RESERVE_CTA[lang]}
+          </Button>
+
+          <div className="mt-8 flex items-center justify-between gap-6">
+            <a
+              href={`mailto:${site.contact.reservations}`}
+              className="text-meta text-ink-subtle"
+            >
+              {site.contact.reservations}
+            </a>
+            <LanguageSwitch
+              lang={lang}
+              label={t.language}
+              onNavigate={onClose}
+              className="shrink-0 pr-0"
+            />
+          </div>
         </div>
       </div>
     </div>

@@ -5,7 +5,63 @@ import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Container } from "@/components/ui/container";
 import { Accent, Heading } from "@/components/ui/heading";
+import { localePath, type Lang } from "@/lib/i18n";
 import { RESERVE_CTA, site } from "@/lib/site";
+
+/**
+ * The three captions, in the order the loop finds them. Adding one here means
+ * adding a window to CAPTIONS as well.
+ */
+const COPY = {
+  en: {
+    walkthrough:
+      "A walkthrough of the residence, from the living room out to the pool terrace.",
+    title: (
+      <>
+        A <Accent>Private</Accent> Side of Cyprus
+      </>
+    ),
+    lead: "An exceptional private residence created for unforgettable stays beneath the Mediterranean sun.",
+    discover: "Discover the Residence",
+    second: (
+      <>
+        There is luxury you can see. Then there is luxury you can{" "}
+        <Accent>feel</Accent>.
+      </>
+    ),
+    third: (
+      <>
+        Contemporary architecture, complete <Accent>privacy</Accent>,
+        effortless indoor-outdoor living.
+      </>
+    ),
+    thirdLead: "A setting designed to be experienced slowly.",
+  },
+  sr: {
+    walkthrough:
+      "Šetnja kroz rezidenciju, od dnevne sobe do terase sa bazenom.",
+    title: (
+      <>
+        <Accent>Privatna</Accent> strana Kipra
+      </>
+    ),
+    lead: "Izuzetna privatna rezidencija stvorena za nezaboravne boravke pod mediteranskim suncem.",
+    discover: "Otkrijte rezidenciju",
+    second: (
+      <>
+        Postoji luksuz koji se vidi. A postoji i luksuz koji se{" "}
+        <Accent>oseća</Accent>.
+      </>
+    ),
+    third: (
+      <>
+        Savremena arhitektura, potpuna <Accent>privatnost</Accent>, prirodan
+        spoj enterijera i eksterijera.
+      </>
+    ),
+    thirdLead: "Ambijent stvoren da se doživi polako.",
+  },
+} as const;
 
 /**
  * The hero is measured in three parts, all as multiples of the viewport.
@@ -83,7 +139,8 @@ const clamp01 = (t: number) => Math.min(Math.max(t, 0), 1);
  * viewport, the video holds on its first frame, and only the first caption
  * shows.
  */
-export function Hero() {
+export function Hero({ lang }: { lang: Lang }) {
+  const t = COPY[lang];
   const sectionRef = useRef<HTMLElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const veilRef = useRef<HTMLDivElement>(null);
@@ -314,7 +371,7 @@ export function Hero() {
             muted
             playsInline
             disablePictureInPicture
-            aria-label="A walkthrough of the residence, from the living room out to the pool terrace."
+            aria-label={t.walkthrough}
             className="absolute inset-0 size-full object-cover"
           >
             <source
@@ -353,36 +410,33 @@ export function Hero() {
             {site.fullName}
           </p>
           <Heading as="h1" size="display" className="text-on-dark">
-            A <Accent>Private</Accent> Side of Cyprus
+            {t.title}
           </Heading>
           <p className="text-lead mx-auto mt-8 max-w-[46ch] text-on-dark/85">
-            An exceptional private residence created for unforgettable stays
-            beneath the Mediterranean sun.
+            {t.lead}
           </p>
           <div className="mt-10 flex flex-wrap justify-center gap-3">
-            <Button href="/contact" size="lg" icon>
-              {RESERVE_CTA}
+            <Button href={localePath("/contact", lang)} size="lg" icon>
+              {RESERVE_CTA[lang]}
             </Button>
             <Button href="#residence" size="lg" variant="onDark">
-              Discover the Residence
+              {t.discover}
             </Button>
           </div>
         </Caption>
 
         <Caption initiallyHidden>
           <Heading as="h2" size="display" className="text-on-dark">
-            There is luxury you can see. Then there is luxury you can{" "}
-            <Accent>feel</Accent>.
+            {t.second}
           </Heading>
         </Caption>
 
         <Caption initiallyHidden>
           <Heading as="h2" size="display" className="text-on-dark">
-            Contemporary architecture, complete <Accent>privacy</Accent>,
-            effortless indoor-outdoor living.
+            {t.third}
           </Heading>
           <p className="text-lead mx-auto mt-8 max-w-[46ch] text-on-dark/85">
-            A setting designed to be experienced slowly.
+            {t.thirdLead}
           </p>
         </Caption>
         </div>

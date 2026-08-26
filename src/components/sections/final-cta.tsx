@@ -8,13 +8,39 @@ import { Reveal } from "@/components/motion/reveal";
 import { Button } from "@/components/ui/button";
 import { Container } from "@/components/ui/container";
 import { Accent, Heading } from "@/components/ui/heading";
+import { localePath, type Lang } from "@/lib/i18n";
 import { RESERVE_CTA, site } from "@/lib/site";
 
-const LINES = [
-  "Come for the Mediterranean sun.",
-  "Stay for the privacy.",
-  "Remember everything in between.",
-] as const;
+const COPY = {
+  en: {
+    title: (
+      <>
+        Cyprus Is <Accent>Waiting</Accent>
+      </>
+    ),
+    lines: [
+      "Come for the Mediterranean sun.",
+      "Stay for the privacy.",
+      "Remember everything in between.",
+    ],
+    signoff: `${site.fullName}. Your private escape in Cyprus.`,
+    alt: "The pool and terrace seen from inside the house.",
+  },
+  sr: {
+    title: (
+      <>
+        Kipar <Accent>čeka</Accent>
+      </>
+    ),
+    lines: [
+      "Dođite zbog mediteranskog sunca.",
+      "Ostanite zbog privatnosti.",
+      "Pamtite sve između.",
+    ],
+    signoff: `${site.fullName}. Vaše privatno bekstvo na Kipru.`,
+    alt: "Bazen i terasa viđeni iz unutrašnjosti kuće.",
+  },
+} as const;
 
 const SCENE_VH = 200;
 
@@ -22,7 +48,8 @@ const SCENE_VH = 200;
  * The closing frame. The photograph settles slowly inward while the type
  * arrives, so the page ends on a held shot rather than a banner.
  */
-export function FinalCta() {
+export function FinalCta({ lang }: { lang: Lang }) {
+  const t = COPY[lang];
   const ref = useRef<HTMLElement>(null);
   const { scrollYProgress } = useScroll({
     target: ref,
@@ -47,7 +74,7 @@ export function FinalCta() {
         >
           <Image
             src="/gallery/pool-terrace/pool-and-terrace-from-house.jpeg"
-            alt="The pool and terrace seen from inside the house."
+            alt={t.alt}
             fill
             sizes="100vw"
             className="object-cover"
@@ -62,11 +89,11 @@ export function FinalCta() {
           <div>
             <Reveal variant="drape">
               <Heading size="mega" className="max-w-[9ch] text-on-dark">
-                Cyprus Is <Accent>Waiting</Accent>
+                {t.title}
               </Heading>
             </Reveal>
             <div className="text-lead mt-10 max-w-[34ch] space-y-2 text-on-dark/85">
-              {LINES.map((line, i) => (
+              {t.lines.map((line, i) => (
                 <Reveal key={line} delay={200 + i * 90}>
                   <p>{line}</p>
                 </Reveal>
@@ -74,11 +101,11 @@ export function FinalCta() {
             </div>
             <Reveal delay={520}>
               <p className="text-meta mt-10 max-w-[40ch] text-on-dark/60">
-                {site.fullName}. Your private escape in Cyprus.
+                {t.signoff}
               </p>
               <Magnetic className="mt-12 inline-block">
-                <Button href="/contact" size="lg" icon>
-                  {RESERVE_CTA}
+                <Button href={localePath("/contact", lang)} size="lg" icon>
+                  {RESERVE_CTA[lang]}
                 </Button>
               </Magnetic>
             </Reveal>

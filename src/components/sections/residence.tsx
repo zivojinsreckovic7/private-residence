@@ -6,11 +6,38 @@ import { motion, useScroll, useTransform } from "motion/react";
 import { Container } from "@/components/ui/container";
 import { ramp } from "@/lib/ramp";
 import { Accent, Heading } from "@/components/ui/heading";
+import type { Lang } from "@/lib/i18n";
 
-const COPY = [
-  "Contemporary architecture meets refined interiors, generous living spaces and an effortless connection between inside and outside.",
-  "Natural light moves throughout the residence, while carefully selected materials and understated detailing create an atmosphere that feels sophisticated without becoming formal.",
-] as const;
+const COPY = {
+  en: {
+    title: (
+      <>
+        Designed for <Accent>Exceptional</Accent> Living
+      </>
+    ),
+    lead: "Every element of MIS Private Residence has been considered as part of one complete experience.",
+    lines: [
+      "Contemporary architecture meets refined interiors, generous living spaces and an effortless connection between inside and outside.",
+      "Natural light moves throughout the residence, while carefully selected materials and understated detailing create an atmosphere that feels sophisticated without becoming formal.",
+    ],
+    close: "This is luxury without excess.",
+    alt: "The living and dining area, open along its full width to the pool terrace.",
+  },
+  sr: {
+    title: (
+      <>
+        Stvoreno za <Accent>izuzetan</Accent> život
+      </>
+    ),
+    lead: "Svaki element rezidencije MIS osmišljen je kao deo jednog celovitog doživljaja.",
+    lines: [
+      "Savremena arhitektura susreće se sa prefinjenim enterijerima, prostranim dnevnim zonama i neusiljenom vezom između unutrašnjeg i spoljašnjeg prostora.",
+      "Prirodna svetlost kreće se kroz celu rezidenciju, dok pažljivo odabrani materijali i suzdržani detalji stvaraju atmosferu koja je sofisticirana, a nikada formalna.",
+    ],
+    close: "Ovo je luksuz bez preterivanja.",
+    alt: "Dnevni i trpezarijski prostor, otvoren celom širinom ka terasi sa bazenom.",
+  },
+} as const;
 
 /** Total scroll the expansion is spread across, as a multiple of the viewport. */
 const SCENE_VH = 230;
@@ -28,7 +55,8 @@ const SCENE_VH = 230;
  * Under reduced motion the CSS collapses the runway to a single viewport and
  * the scene simply presents its finished state.
  */
-export function Residence() {
+export function Residence({ lang }: { lang: Lang }) {
+  const t = COPY[lang];
   const ref = useRef<HTMLElement>(null);
   const { scrollYProgress } = useScroll({
     target: ref,
@@ -64,7 +92,7 @@ export function Residence() {
           >
             <Image
               src="/gallery/living/living-and-dining-toward-pool.jpeg"
-              alt="The living and dining area, open along its full width to the pool terrace."
+              alt={t.alt}
               fill
               sizes="100vw"
               className="object-cover"
@@ -83,7 +111,7 @@ export function Residence() {
         >
           <Container>
             <Heading size="display" className="max-w-[14ch] text-on-dark">
-              Designed for <Accent>Exceptional</Accent> Living
+              {t.title}
             </Heading>
           </Container>
         </motion.div>
@@ -100,17 +128,14 @@ export function Residence() {
         >
           <Container>
             <div className="max-w-[52ch]">
-              <p className="text-lead text-on-dark">
-                Every element of MIS Private Residence has been considered as
-                part of one complete experience.
-              </p>
-              {COPY.map((line) => (
+              <p className="text-lead text-on-dark">{t.lead}</p>
+              {t.lines.map((line) => (
                 <p key={line} className="text-body mt-4 text-on-dark/75">
                   {line}
                 </p>
               ))}
               <p className="font-serif text-title mt-8 text-on-dark">
-                This is luxury without excess.
+                {t.close}
               </p>
             </div>
           </Container>

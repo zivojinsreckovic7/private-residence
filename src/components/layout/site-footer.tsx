@@ -3,9 +3,17 @@ import { AppLink } from "@/components/ui/app-link";
 import { Container } from "@/components/ui/container";
 import { Section } from "@/components/ui/section";
 import { Wordmark } from "@/components/ui/wordmark";
-import { legalLinks, navigation, site } from "@/lib/site";
+import { localePath, type Lang } from "@/lib/i18n";
+import { SHARED, TAGLINE, legalLinks, navigation, site } from "@/lib/site";
 
-export function SiteFooter() {
+const COPY = {
+  en: { footer: "Footer" },
+  sr: { footer: "Podnožje stranice" },
+} as const;
+
+export function SiteFooter({ lang }: { lang: Lang }) {
+  const shared = SHARED[lang];
+
   return (
     <Section
       as="footer"
@@ -17,7 +25,7 @@ export function SiteFooter() {
           <div>
             <Wordmark size="lg" tone="onDark" />
             <p className="text-body mt-6 max-w-[32ch] text-on-dark-muted">
-              {site.tagline}
+              {TAGLINE[lang]}
             </p>
             <a
               href={site.contact.instagram}
@@ -28,29 +36,31 @@ export function SiteFooter() {
             </a>
           </div>
 
-          <nav aria-label="Footer" className="flex flex-col gap-4">
+          <nav aria-label={COPY[lang].footer} className="flex flex-col gap-4">
             {navigation.map((item) => (
               <AppLink
                 key={item.href}
-                href={item.href}
+                href={localePath(item.href, lang)}
                 className="text-meta text-on-dark-muted transition-colors duration-(--dur-fast) hover:text-accent-bright"
               >
-                {item.label}
+                {item.label[lang]}
               </AppLink>
             ))}
           </nav>
 
           <div className="flex flex-col gap-8">
             <FooterContact
-              label="Reservations"
+              label={shared.reservations}
               value={site.contact.reservations}
             />
             <FooterContact
-              label="General Enquiries"
+              label={shared.general}
               value={site.contact.general}
             />
             <div>
-              <p className="text-label uppercase text-on-dark/45">Address</p>
+              <p className="text-label uppercase text-on-dark/45">
+                {shared.address}
+              </p>
               <address className="text-meta mt-2 not-italic text-on-dark-muted">
                 {site.address.lines.map((line) => (
                   <span key={line} className="block">
@@ -64,7 +74,7 @@ export function SiteFooter() {
                 rel="noreferrer"
                 className="text-meta mt-3 inline-block text-on-dark-muted underline underline-offset-4 transition-colors duration-(--dur-fast) hover:text-accent-bright"
               >
-                Open in Google Maps
+                {shared.openInMaps}
               </a>
             </div>
 
@@ -82,17 +92,16 @@ export function SiteFooter() {
             {legalLinks.map((link) => (
               <li key={link.href}>
                 <AppLink
-                  href={link.href}
+                  href={localePath(link.href, lang)}
                   className="text-meta text-on-dark-muted transition-colors duration-(--dur-fast) hover:text-accent-bright"
                 >
-                  {link.label}
+                  {link.label[lang]}
                 </AppLink>
               </li>
             ))}
           </ul>
           <p className="text-meta text-on-dark-muted">
-            &copy; {new Date().getFullYear()} {site.fullName}. All rights
-            reserved.
+            {shared.copyright(new Date().getFullYear())}
           </p>
         </div>
       </Container>
