@@ -37,6 +37,9 @@ src/
     layout.tsx         fonts, metadata, header and footer chrome
     globals.css        design tokens + the handful of global rules
     page.tsx           home
+    favicon.ico        the crest, 16/32/48; see scripts/make-icons.py
+    icon.png           the crest, 512
+    apple-icon.png     the crest, 180
     styleguide/        living specimen of the system, noindex, not linked
   components/
     ui/                primitives, no page knowledge  (Button, Section, ...)
@@ -44,6 +47,8 @@ src/
     motion/            the motion system              (Reveal, Parallax, ...)
     sections/          one file per landing section   (Hero, Cyprus, Faq, ...)
   lib/                 fonts, brand config, helpers
+scripts/
+  make-icons.py        regenerates the three app icons from the crest
 media-source/          original masters, not served, not deployed
 public/
   logo.jpeg            the crest raster; see the Wordmark note below
@@ -264,6 +269,15 @@ itself; against anything else the JPEG shows a box.
 - `public/logo.jpeg` is a raster on a cream ground, so it cannot sit on the
   white page. `<Wordmark>` type-sets the mark in Cormorant instead. Swap in the
   crest SVG when it exists; the component API stays the same.
+- **The app icons are generated, not hand-cropped.** `scripts/make-icons.py`
+  cuts them from `public/logo-mark.jpg`; run it if the crest artwork changes.
+  Two things in there are load-bearing. The wordmark under the rule is dropped
+  entirely, and 16px gets a tighter crop than the rest: at that size the gold
+  bracket and palm turn to noise across the top third of the tile and take the
+  monogram down with them. And every image inside the `.ico` is saved **RGBA**
+  — Next stores ICO entries as PNG and its decoder rejects a non-RGBA one with
+  "The PNG is not in RGBA format!", which fails the build outright rather than
+  degrading the icon.
 - The header is one state and only one: a floating pill, pinned, always
   visible, identical at every scroll position. It deliberately has no
   scroll listener, observer or MotionValue. If you are tempted to make it
