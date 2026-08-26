@@ -1,69 +1,28 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import {
-  motion,
-  useMotionValue,
-  useMotionValueEvent,
-  useReducedMotion,
-  useScroll,
-  useSpring,
-} from "motion/react";
 import { Magnetic } from "@/components/motion/magnetic";
 import { Button } from "@/components/ui/button";
 import { Wordmark } from "@/components/ui/wordmark";
 import { cn } from "@/lib/cn";
 import { RESERVE_CTA, navigation, site } from "@/lib/site";
 
-/** Scroll past this before the header is allowed to retract. */
-const RETRACT_AFTER = 600;
-
 /**
  * Site header.
  *
- * Three states, and the transitions between them are the point:
- * - Over the hero it is full width, tall and transparent, so nothing competes
- *   with the footage.
- * - Once past the hero it condenses into a floating glass pill inset from the
- *   edges, rather than a bar glued to the top of the window.
- * - Scrolling down retracts it out of frame and scrolling up brings it back,
- *   so long stretches of photography are never interrupted.
+ * One state, always: a floating glass pill inset from the edges, pinned to the
+ * top of the window for the whole page. It never retracts and it never
+ * dissolves into the photography, so navigation and the reservation link are
+ * one glance away at any point in a forty-viewport scroll.
  *
- * The retraction is driven by MotionValues rather than React state, so the
- * header never re-renders while the page scrolls. Only the transparent/pill
- * switch is state, and that flips once per hero crossing.
+ * Because it is always the same thing, there is nothing here driven by scroll:
+ * no listener, no observer, no MotionValues. The only state is whether the
+ * mobile menu is open.
  *
- * z-index scale: mobile overlay 30, header 40, loading curtain 50,
- * grain 60.
+ * z-index scale: mobile overlay 30, header 40, loading curtain 50, grain 60.
  */
 export function SiteHeader() {
-  const [overHero, setOverHero] = useState(false);
   const [open, setOpen] = useState(false);
-  const reduced = useReducedMotion();
-
-  const { scrollY } = useScroll();
-  const shift = useMotionValue(0);
-  const y = useSpring(shift, { stiffness: 260, damping: 34, mass: 0.7 });
-
-  useEffect(() => {
-    const hero = document.querySelector("[data-hero]");
-    if (!hero) return;
-
-    const observer = new IntersectionObserver(
-      ([entry]) => setOverHero(entry.isIntersecting),
-      { rootMargin: "-72px 0px 0px 0px", threshold: 0 },
-    );
-
-    observer.observe(hero);
-    return () => observer.disconnect();
-  }, []);
-
-  useMotionValueEvent(scrollY, "change", (current) => {
-    if (open || reduced) return;
-    const previous = scrollY.getPrevious() ?? 0;
-    const goingDown = current > previous;
-    shift.set(goingDown && current > RETRACT_AFTER ? -140 : 0);
-  });
 
   useEffect(() => {
     if (!open) return;
@@ -76,32 +35,24 @@ export function SiteHeader() {
     };
   }, [open]);
 
-  const onPhoto = overHero && !open;
-
   return (
     <>
-      <motion.header
-        style={{ y }}
-        className="fixed inset-x-0 top-0 z-40 will-change-transform"
-      >
+      <header className="fixed inset-x-0 top-0 z-40">
         <div
           className={cn(
-            "mx-auto flex items-center justify-between gap-8",
-            "transition-[height,background-color,box-shadow,margin,padding,border-radius]",
-            "duration-(--dur-base) ease-out-expo",
-            onPhoto
-              ? "h-24 max-w-[1440px] px-5 md:px-10"
-              : "mt-3 h-14 max-w-[1240px] rounded-full bg-canvas/80 px-3 pl-6 shadow-soft ring-1 ring-line backdrop-blur-xl md:mt-4",
-            !onPhoto && "mx-4 md:mx-8",
+            "mx-4 mt-3 flex h-14 max-w-[1240px] items-center justify-between",
+            "gap-8 rounded-full px-3 pl-6 md:mx-8 md:mt-4",
+            "bg-canvas/80 shadow-soft ring-1 ring-line backdrop-blur-xl",
+            "xl:mx-auto",
           )}
         >
           <a href="#top" aria-label={`${site.fullName}, home`}>
-            <Wordmark tone={onPhoto ? "onDark" : "ink"} />
+            <Wordmark />
           </a>
 
           <nav className="hidden items-center gap-8 lg:flex">
             {navigation.map((item) => (
-              <NavLink key={item.href} href={item.href} onPhoto={onPhoto}>
+              <NavLink key={item.href} href={item.href}>
                 {item.label}
               </NavLink>
             ))}
@@ -109,11 +60,7 @@ export function SiteHeader() {
 
           <div className="flex items-center gap-2">
             <Magnetic className="hidden sm:block">
-              <Button
-                href="#contact"
-                variant={onPhoto ? "onDark" : "primary"}
-                icon={!onPhoto}
-              >
+              <Button href="#contact" icon>
                 {RESERVE_CTA}
               </Button>
             </Magnetic>
@@ -123,16 +70,13 @@ export function SiteHeader() {
               onClick={() => setOpen((v) => !v)}
               aria-label={open ? "Close menu" : "Open menu"}
               aria-expanded={open}
-              className={cn(
-                "relative size-11 shrink-0 rounded-full lg:hidden",
-                onPhoto ? "text-on-dark" : "text-ink",
-              )}
+              className="relative size-11 shrink-0 rounded-full text-ink lg:hidden"
             >
               <MenuLines open={open} />
             </button>
           </div>
         </div>
-      </motion.header>
+      </header>
 
       <MobileMenu open={open} onClose={() => setOpen(false)} />
     </>
@@ -142,31 +86,23 @@ export function SiteHeader() {
 /** Nav link with a rule that wipes in from the left. */
 function NavLink({
   href,
-  onPhoto,
   children,
 }: {
   href: string;
-  onPhoto: boolean;
   children: React.ReactNode;
 }) {
   return (
     <a
       href={href}
-      className={cn(
-        "group relative text-meta transition-colors duration-(--dur-fast)",
-        onPhoto
-          ? "text-on-dark/85 hover:text-on-dark"
-          : "text-ink-muted hover:text-ink",
-      )}
+      className="group relative text-meta text-ink-muted transition-colors duration-(--dur-fast) hover:text-ink"
     >
       {children}
       <span
         aria-hidden
         className={cn(
-          "absolute -bottom-1.5 left-0 h-px w-full origin-left scale-x-0",
+          "absolute -bottom-1.5 left-0 h-px w-full origin-left scale-x-0 bg-accent",
           "transition-transform duration-(--dur-base) ease-out-expo",
           "group-hover:scale-x-100",
-          onPhoto ? "bg-on-dark" : "bg-accent",
         )}
       />
     </a>

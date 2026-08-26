@@ -148,7 +148,7 @@ bottom edge), `still` for anything that should simply be present.
 
 **Motion (`motion/react`), for scroll-linked motion only.** Anything whose
 value is a continuous function of scroll position: the pinned scenes, the
-gallery pan, parallax, the header's retraction. Always through MotionValues,
+gallery pan, parallax. Always through MotionValues,
 never React state, so scrolling never triggers a render. That is the only
 reason Motion is a dependency; do not reach for it for entrances.
 
@@ -258,7 +258,15 @@ itself; against anything else the JPEG shows a box.
 - `public/logo.jpeg` is a raster on a cream ground, so it cannot sit on the
   white page. `<Wordmark>` type-sets the mark in Cormorant instead. Swap in the
   crest SVG when it exists; the component API stays the same.
-- A page opts its hero into the transparent header by marking it `data-hero`.
+- The header is one state and only one: a floating pill, pinned, always
+  visible, identical at every scroll position. It deliberately has no
+  scroll listener, observer or MotionValue. If you are tempted to make it
+  retract or dissolve over the hero again, that was tried and removed:
+  navigation and the reservation link need to be one glance away across a
+  forty-viewport page.
+- `data-hero` marks the hero section. Nothing in the app reads it any more now
+  that the header no longer changes over it; it is kept as a stable hook for
+  verification scripts.
 - **`max-w-[Nch]` belongs on the element that carries the font size**, not on a
   `Reveal` wrapper around it. `ch` resolves against the element's own font, so
   `max-w-[20ch]` on a wrapper is about 160px and squeezes a display heading to
