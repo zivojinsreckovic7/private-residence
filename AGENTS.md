@@ -178,8 +178,14 @@ and the sections between them are deliberately still so those moments land.
 ## Layering
 
 `motion/scroll-overlay.tsx` and `motion/rising-plate.tsx` are pure CSS sticky.
-A plate rides up over a pinned backdrop with a contact shadow along its leading
-edge, so sections emerge from underneath one another rather than following on.
+A plate rides up over a pinned backdrop carrying a white bloom above its
+leading edge, so the backdrop dissolves into the plate rather than being cut
+across by a line. The bloom is two layered gradients: a radial one centred on
+the edge, which is the whole of the effect at centre, over a shallow linear
+one that catches the corners the radial does not reach. It replaced a dark
+contact shadow; if you are tempted to put an edge back, the brief was
+explicitly for a seamless blend. It is hidden under `motion-reduce`, where the
+plate has no overlap and the bloom would land on the hero's own copy.
 The hero exports `HERO_OVERLAP` and the introduction consumes it: that pairing
 is a deliberate composition, not incidental coupling.
 
