@@ -1,5 +1,6 @@
 import { Reveal } from "@/components/motion/reveal";
 import { Container } from "@/components/ui/container";
+import { Figure } from "@/components/ui/figure";
 import { Accent, Heading } from "@/components/ui/heading";
 import { Section } from "@/components/ui/section";
 
@@ -16,17 +17,36 @@ const ELEMENTS = [
  * A deliberate rest between two loud sections. Nothing moves here except the
  * lines arriving in order, which is the whole point: after the residence opens
  * out and before the day begins, the page holds still.
+ *
+ * The heading leaves most of its column empty, so one detail shot sits at the
+ * foot of it: a close-up rather than a wide view, because the list beside it is
+ * about small things adding up.
  */
 export function FeatureIntro() {
   return (
     <Section tone="canvas" className="py-40 md:py-56">
       <Container>
         <div className="grid gap-16 lg:grid-cols-12">
-          <Reveal variant="drape" className="lg:col-span-5">
-            <Heading size="display" className="max-w-[10ch]">
-              Everything in Its <Accent>Place</Accent>
-            </Heading>
-          </Reveal>
+          <div className="flex flex-col lg:col-span-5">
+            <Reveal variant="drape">
+              <Heading size="display" className="max-w-[10ch]">
+                Everything in Its <Accent>Place</Accent>
+              </Heading>
+            </Reveal>
+
+            <Reveal
+              variant="mask"
+              delay={120}
+              className="mt-16 max-w-[26rem] lg:mt-auto"
+            >
+              <Figure
+                src="/gallery/details/poolside-tray-and-pomegranates.jpeg"
+                alt="A woven tray of water and mint set beside a bowl of pomegranates at the edge of the pool."
+                aspect="aspect-[4/3]"
+                sizes="(min-width: 1024px) 26rem, 100vw"
+              />
+            </Reveal>
+          </div>
 
           <div className="lg:col-span-6 lg:col-start-7">
             <Reveal delay={80}>
