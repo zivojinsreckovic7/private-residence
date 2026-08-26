@@ -36,6 +36,10 @@ yarn-error.log*
 # vercel
 .vercel
 
+# original camera masters: kept locally, not build inputs. The encoded hero
+# sources in public/hero are generated from these; see AGENTS.md.
+/media-source
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts
