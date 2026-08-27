@@ -34,9 +34,15 @@ export function proxy(request: NextRequest) {
 
 export const config = {
   /**
-   * Everything except Next's own assets and anything that looks like a file in
-   * `public/` — the photography, the video tiers, the icons. Without this the
-   * rewrite would send `/logo.jpeg` to `/en/logo.jpeg`, which is nothing.
+   * Everything except three things that are not pages:
+   *
+   * - `/api/...`, which has no language and lives outside `app/[lang]`. Left
+   *   in, the rewrite sends the reservation form's endpoint to
+   *   `/en/api/reservations`, which is nothing, and the form 404s.
+   * - Next's own assets.
+   * - Anything that looks like a file in `public/` — the photography, the
+   *   video tiers, the icons, `sitemap.xml`, `robots.txt`. Without this the
+   *   rewrite would send `/logo.jpeg` to `/en/logo.jpeg`, which is nothing.
    */
-  matcher: ["/((?!_next/|.*\\.[\\w]+$).*)"],
+  matcher: ["/((?!api/|_next/|.*\\.[\\w]+$).*)"],
 };

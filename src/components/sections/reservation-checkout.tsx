@@ -75,10 +75,23 @@ const COPY = {
         "We reply with availability and written terms for your dates. Nothing is charged, and nothing is confirmed, until you say yes.",
       privacy: "Your details are used to answer this request and nothing else.",
     },
-    bar: { empty: "Add your dates", submit: "Request" },
-    notice: {
-      title: "One last step — nothing has been sent yet.",
-      body: "This page is not connected to our inbox yet, so we have written the request out for you instead. Open it in your email app and send it, and we will reply personally, usually within 24 hours.",
+    bar: { empty: "Add your dates", submit: "Request", sending: "Sending" },
+    sending: "Sending your request",
+    sent: {
+      badge: "Request sent",
+      title: "Your request is with us.",
+      body: (email: React.ReactNode) => (
+        <>
+          A copy is on its way to {email}. Someone from our team will reply
+          personally, usually within 24 hours, with availability and written
+          terms for your dates.
+        </>
+      ),
+      note: "Nothing has been charged and nothing is confirmed yet. You can change or cancel simply by replying to that email.",
+    },
+    error: {
+      title: "That did not go through.",
+      body: "Something went wrong at our end — nothing you typed is lost. Send the request straight from your email app instead, or try again in a moment.",
       action: "Open the request in email",
       fallback: "Or write to us directly at",
     },
@@ -144,10 +157,23 @@ const COPY = {
       privacy:
         "Vaše podatke koristimo isključivo da odgovorimo na ovaj zahtev.",
     },
-    bar: { empty: "Unesite datume", submit: "Pošaljite" },
-    notice: {
-      title: "Još jedan korak — ništa još nije poslato.",
-      body: "Ova stranica još nije povezana sa našim sandučetom, pa smo zahtev ispisali umesto vas. Otvorite ga u svojoj imejl aplikaciji i pošaljite, a mi odgovaramo lično, obično u roku od 24 sata.",
+    bar: { empty: "Unesite datume", submit: "Pošaljite", sending: "Šaljemo" },
+    sending: "Šaljemo vaš zahtev",
+    sent: {
+      badge: "Zahtev je poslat",
+      title: "Vaš zahtev je stigao do nas.",
+      body: (email: React.ReactNode) => (
+        <>
+          Kopija je na putu ka {email}. Neko iz našeg tima javiće vam se lično,
+          obično u roku od 24 sata, sa dostupnošću i pisanim uslovima za vaše
+          datume.
+        </>
+      ),
+      note: "Ništa nije naplaćeno i ništa još nije potvrđeno. Sve možete izmeniti ili otkazati odgovorom na taj imejl.",
+    },
+    error: {
+      title: "Slanje nije uspelo.",
+      body: "Nešto je zapelo na našoj strani — ništa što ste uneli nije izgubljeno. Pošaljite zahtev direktno iz svoje imejl aplikacije ili pokušajte ponovo za koji trenutak.",
       action: "Otvorite zahtev u imejlu",
       fallback: "Ili nam pišite direktno na",
     },
@@ -157,15 +183,19 @@ const COPY = {
 /** Enough for any party the residence takes; not a statement of capacity. */
 const MAX_GUESTS = 16;
 
+type Status = "idle" | "sending" | "sent" | "error";
+
 /**
  * The reservation request: the form and the summary that reads back from it,
  * as one component because they share the same state.
  *
- * It is deliberately not wired to anything — there is no route handler and no
- * inbox behind it. Rather than swallow the guest's typing, the submit writes
- * the whole request into a `mailto:` and hands it back, so the page works end
- * to end today and says plainly that nothing has been sent. When the endpoint
- * exists, replace the body of `onSubmit`; nothing else here changes.
+ * The submit posts to `/api/reservations`, which validates everything again
+ * and sends two messages: the request to the residence, and a confirmation to
+ * the guest. Nothing about the sending happens here — the key is the server's.
+ *
+ * If that call fails the guest is not left holding an error. The request is
+ * written into a `mailto:` with everything they typed, so the worst outcome is
+ * one extra click rather than a lost booking.
  */
 export function ReservationCheckout({
   lang,
@@ -180,7 +210,12 @@ export function ReservationCheckout({
   const [departure, setDeparture] = useState("");
   const [guests, setGuests] = useState(2);
   const [occasion, setOccasion] = useState("");
-  const [request, setRequest] = useState<string | null>(null);
+
+  const [status, setStatus] = useState<Status>("idle");
+  /** Where the confirmation went, for the sent panel to name. */
+  const [sentTo, setSentTo] = useState("");
+  /** The request as a `mailto:`, offered only if the send failed. */
+  const [fallback, setFallback] = useState<string | null>(null);
 
   /**
    * Today, as the floor under both date fields. Read from the guest's own
@@ -189,46 +224,93 @@ export function ReservationCheckout({
    * anyone read the page and would not match what the browser hydrates with.
    */
   const [today, setToday] = useState("");
-  const stampToday = () => {
+
+  /**
+   * When the guest first touched the form. The endpoint rejects a submit that
+   * follows within a few seconds, which no person manages and every script
+   * does. A ref, not state: nothing on screen depends on it.
+   */
+  const startedAt = useRef(0);
+
+  const stamp = () => {
+    if (!startedAt.current) startedAt.current = Date.now();
     if (!today) setToday(new Date().toISOString().slice(0, 10));
   };
 
   const nights = nightsBetween(arrival, departure);
   const noticeRef = useRef<HTMLDivElement>(null);
 
-  // The request is the one thing on the page worth moving the reader to.
+  // Whatever the answer is, it is the one thing on the page worth moving the
+  // reader to.
   useEffect(() => {
-    if (request) noticeRef.current?.focus();
-  }, [request]);
+    if (status === "sent" || status === "error") noticeRef.current?.focus();
+  }, [status]);
+
+  async function submit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (status === "sending") return;
+
+    // Read the form before the first await: React clears `currentTarget` once
+    // the handler returns, and the fallback needs these values.
+    const data = new FormData(event.currentTarget);
+    const email = String(data.get("email") ?? "").trim();
+
+    setStatus("sending");
+    try {
+      const response = await fetch("/api/reservations", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          lang,
+          startedAt: startedAt.current,
+          company: data.get("company"),
+          arrival: data.get("arrival"),
+          departure: data.get("departure"),
+          guests: data.get("guests"),
+          occasion: data.get("occasion"),
+          arrangements: data.getAll("arrangements"),
+          name: data.get("name"),
+          email,
+          phone: data.get("phone"),
+          country: data.get("country"),
+          message: data.get("message"),
+        }),
+      });
+      if (!response.ok) throw new Error(String(response.status));
+      setSentTo(email);
+      setStatus("sent");
+    } catch {
+      // The guest keeps everything they typed, in a form they can send by hand.
+      setFallback(composeRequest(data, lang));
+      setStatus("error");
+    }
+  }
 
   return (
     <form
       aria-label={t.formLabel}
-      onSubmit={(event) => {
-        event.preventDefault();
-        setRequest(composeRequest(new FormData(event.currentTarget), lang));
-      }}
+      onSubmit={submit}
+      onFocusCapture={stamp}
+      onPointerDownCapture={stamp}
     >
       <Container className="grid items-start gap-8 lg:grid-cols-[1.15fr_0.85fr] lg:gap-14">
         <div>
-          {request && (
+          {status === "error" && fallback && (
             <div
               ref={noticeRef}
               tabIndex={-1}
-              role="status"
+              role="alert"
               className="rounded-surface mb-6 border border-accent/35 bg-accent-tint p-6 sm:p-8"
             >
-              <p className="text-title font-medium text-ink">
-                {t.notice.title}
-              </p>
+              <p className="text-title font-medium text-ink">{t.error.title}</p>
               <p className="text-body mt-3 max-w-[54ch] text-ink-muted">
-                {t.notice.body}
+                {t.error.body}
               </p>
-              <Button href={request} icon className="mt-6">
-                {t.notice.action}
+              <Button href={fallback} icon className="mt-6">
+                {t.error.action}
               </Button>
               <p className="text-meta mt-5 text-ink-subtle">
-                {t.notice.fallback}{" "}
+                {t.error.fallback}{" "}
                 <a
                   href={`mailto:${site.contact.reservations}`}
                   className="text-accent underline underline-offset-4"
@@ -239,13 +321,38 @@ export function ReservationCheckout({
             </div>
           )}
 
+          {status === "sent" ? (
+            /*
+              The form is done, so it goes: what is left to read is what
+              happens next, and the summary alongside still shows the stay
+              exactly as it was sent.
+            */
+            <div
+              ref={noticeRef}
+              tabIndex={-1}
+              role="status"
+              className="rounded-surface border border-line bg-canvas p-8 sm:p-12"
+            >
+              <p className="text-label inline-flex items-center gap-2 uppercase text-accent">
+                <Check size={14} weight="bold" aria-hidden />
+                {t.sent.badge}
+              </p>
+              <p className="text-headline mt-5 max-w-[18ch] font-serif font-light text-ink">
+                {t.sent.title}
+              </p>
+              <p className="text-lead mt-6 max-w-[48ch] text-ink-muted">
+                {t.sent.body(
+                  <span className="whitespace-nowrap text-ink">{sentTo}</span>,
+                )}
+              </p>
+              <p className="text-meta mt-6 max-w-[52ch] border-t border-line pt-6 text-ink-subtle">
+                {t.sent.note}
+              </p>
+            </div>
+          ) : (
           <Reveal className="rounded-surface border border-line bg-canvas p-6 sm:p-10">
             <Step index="01" title={t.steps[0].title} note={t.steps[0].note} />
-            <div
-              onFocusCapture={stampToday}
-              onPointerDownCapture={stampToday}
-              className="mt-7 grid gap-5 sm:grid-cols-2"
-            >
+            <div className="mt-7 grid gap-5 sm:grid-cols-2">
               <Field
                 label={t.arrival}
                 name="arrival"
@@ -386,7 +493,25 @@ export function ReservationCheckout({
               placeholder={t.messagePlaceholder}
               className="mt-7"
             />
+
+            {/*
+              The honeypot: a field no guest can reach, that a script fills in
+              anyway. Clipped rather than `display:none`, which the better
+              scripts check for, and kept out of both the tab order and the
+              accessibility tree so it costs nobody anything.
+            */}
+            <div aria-hidden className="sr-only">
+              <label htmlFor="company">Company</label>
+              <input
+                id="company"
+                name="company"
+                type="text"
+                tabIndex={-1}
+                autoComplete="off"
+              />
+            </div>
           </Reveal>
+          )}
         </div>
 
         <Reveal
@@ -451,11 +576,23 @@ export function ReservationCheckout({
             ))}
           </ul>
 
-          <Magnetic className="mt-8 block">
-            <Button size="lg" icon className="w-full">
-              {t.summary.submit}
-            </Button>
-          </Magnetic>
+          {status === "sent" ? (
+            <p className="text-meta mt-8 flex items-center justify-center gap-2 rounded-full border border-accent/35 bg-accent-tint py-3.5 font-medium text-accent">
+              <Check size={15} weight="bold" aria-hidden />
+              {t.sent.badge}
+            </p>
+          ) : (
+            <Magnetic className="mt-8 block">
+              <Button
+                size="lg"
+                icon={status !== "sending"}
+                disabled={status === "sending"}
+                className="w-full"
+              >
+                {status === "sending" ? t.sending : t.summary.submit}
+              </Button>
+            </Magnetic>
+          )}
 
           <p className="text-meta mt-5 flex items-start gap-2 text-ink">
             <Lock
@@ -479,16 +616,20 @@ export function ReservationCheckout({
         screen and then comes to rest at the end of it, instead of hanging over
         the sections and the footer below.
       */}
-      <div className="sticky bottom-0 z-20 mt-8 border-t border-line bg-canvas px-5 py-3 lg:hidden">
-        <div className="flex items-center justify-between gap-4">
-          <p className="text-meta text-ink-muted">
-            {nights
-              ? `${nights} ${nightWord(nights, lang)} · ${guests} ${guestWord(guests, lang)}`
-              : t.bar.empty}
-          </p>
-          <Button className="shrink-0">{t.bar.submit}</Button>
+      {status !== "sent" && (
+        <div className="sticky bottom-0 z-20 mt-8 border-t border-line bg-canvas px-5 py-3 lg:hidden">
+          <div className="flex items-center justify-between gap-4">
+            <p className="text-meta text-ink-muted">
+              {nights
+                ? `${nights} ${nightWord(nights, lang)} · ${guests} ${guestWord(guests, lang)}`
+                : t.bar.empty}
+            </p>
+            <Button disabled={status === "sending"} className="shrink-0">
+              {status === "sending" ? t.bar.sending : t.bar.submit}
+            </Button>
+          </div>
         </div>
-      </div>
+      )}
     </form>
   );
 }

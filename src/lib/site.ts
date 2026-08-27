@@ -17,6 +17,18 @@ export const site = {
     reservations: "reservation@misprivateresidence.com",
     general: "info@misprivateresidence.com",
     instagram: "https://instagram.com/misprivateresidence",
+    /**
+     * What the reservation form sends as.
+     *
+     * `reservation.misprivateresidence.com` is a sending subdomain verified
+     * with Resend, deliberately not the root domain: the root is where Titan's
+     * MX and SPF live, and a sending service wants records at the same names.
+     * Keeping them apart means nothing here can affect the mailbox.
+     *
+     * Guests never write to this address — every message sets `Reply-To`, so a
+     * reply reaches a person either way.
+     */
+    sender: "MIS Private Residence <no-reply@reservation.misprivateresidence.com>",
   },
   /**
    * The residence's address. `lines` is the postal form, written the way it

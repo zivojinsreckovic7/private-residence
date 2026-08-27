@@ -249,6 +249,32 @@ destination are one decision, and this route has already moved once. The
 contact page, the reused `<Contact>` section and `<ContactForm>` say in copy
 that they are the general line and link across to `/reservations` for dates.
 
+**The form sends for real.** `POST /api/reservations` validates every field
+again on the server — the checks in the browser are a courtesy to the guest,
+nothing more — then sends two messages through Resend: the request to the
+residence with `Reply-To` set to the guest, and a confirmation back to the
+guest in the language they were reading. `RESEND_API_KEY` is read from the
+environment on the server and must never be `NEXT_PUBLIC_`.
+
+Three things there are load-bearing:
+
+- **`/api` is excluded from the proxy matcher.** Left in, the rewrite sends the
+  endpoint to `/en/api/reservations`, which does not exist, and the form 404s
+  with no other symptom. Any future route outside `app/[lang]` needs the same.
+- **Mail goes out from `reservation.misprivateresidence.com`**, a sending
+  subdomain verified with Resend, never from the root domain. The root is where
+  Titan's MX and SPF live; a sending service wants records at those same names,
+  and the two do not share. `site.contact.sender` is the address.
+- **A failed send is not an error the guest has to solve.** The route fails the
+  call only if the message to the residence fails, and the form then hands back
+  everything typed as a `mailto:`. The guest's confirmation is best-effort: if
+  it fails the booking has still arrived, so it is logged, not surfaced.
+
+Spam is handled without a captcha: a clipped honeypot field, a rejection of
+anything submitted within three seconds of first touch, and a per-IP rate limit
+held in the instance's memory. That last one is a brake, not a lock — reach for
+something shared only when one instance stops being where the abuse lands.
+
 **The reservation page is a checkout, and is built like one**, not like the
 rest of the site: no pinned scene, one photograph, and the request itself above
 the fold on a laptop. `sections/reservation-checkout.tsx` is the whole unit —
@@ -258,10 +284,8 @@ way of sending: what happens next, who you are writing to, and what asking
 costs you. It claims no price, no review score and no capacity, because the
 site publishes none of those; every trust signal on it is verifiable.
 
-Like `<ContactForm>`, it is wired to no inbox. Rather than swallow the typing,
-the submit writes the whole request into a `mailto:` and hands it back, saying
-plainly that nothing has been sent. Replace the body of `onSubmit` when there
-is an endpoint.
+`<ContactForm>` on `/contact` is still wired to no inbox and still hands its
+request back as a `mailto:`. Only the reservation form sends.
 
 `/experiences` composes the landing page's own experience sections rather than
 restating them — `Experience`, `Occasions`, `Testimonials`, `Personal` — so
