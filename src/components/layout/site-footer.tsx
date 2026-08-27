@@ -4,7 +4,7 @@ import { Container } from "@/components/ui/container";
 import { Section } from "@/components/ui/section";
 import { Wordmark } from "@/components/ui/wordmark";
 import { localePath, type Lang } from "@/lib/i18n";
-import { SHARED, TAGLINE, legalLinks, navigation, site } from "@/lib/site";
+import { SHARED, TAGLINE, navigation, site } from "@/lib/site";
 
 const COPY = {
   en: { footer: "Footer" },
@@ -78,28 +78,22 @@ export function SiteFooter({ lang }: { lang: Lang }) {
               </a>
             </div>
 
-            <a
-              href={site.url}
+            {/*
+              The domain, as the domain — but linked to this edition's home
+              page rather than to the absolute URL. Written out it was the
+              site's one internal link that left the app: a full page load on
+              click, and, from the Serbian edition, a link into English.
+            */}
+            <AppLink
+              href={localePath("/", lang)}
               className="text-meta text-on-dark-muted transition-colors duration-(--dur-fast) hover:text-accent-bright"
             >
               www.misprivateresidence.com
-            </a>
+            </AppLink>
           </div>
         </div>
 
-        <div className="mt-20 flex flex-col gap-6 border-t border-line-on-dark pt-8 sm:flex-row sm:items-center sm:justify-between">
-          <ul className="flex flex-wrap gap-x-8 gap-y-3">
-            {legalLinks.map((link) => (
-              <li key={link.href}>
-                <AppLink
-                  href={localePath(link.href, lang)}
-                  className="text-meta text-on-dark-muted transition-colors duration-(--dur-fast) hover:text-accent-bright"
-                >
-                  {link.label[lang]}
-                </AppLink>
-              </li>
-            ))}
-          </ul>
+        <div className="mt-20 border-t border-line-on-dark pt-8">
           <p className="text-meta text-on-dark-muted">
             {shared.copyright(new Date().getFullYear())}
           </p>

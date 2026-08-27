@@ -1,29 +1,42 @@
+import { AppLink } from "@/components/ui/app-link";
 import { Container } from "@/components/ui/container";
 import { ContactForm } from "@/components/sections/contact-form";
 import { Accent, Heading } from "@/components/ui/heading";
 import { Reveal } from "@/components/motion/reveal";
 import { Section } from "@/components/ui/section";
-import type { Lang } from "@/lib/i18n";
-import { SHARED, site } from "@/lib/site";
+import { localePath, type Lang } from "@/lib/i18n";
+import { RESERVE_PATH, SHARED, site } from "@/lib/site";
 
 const COPY = {
   en: {
     title: (
       <>
-        Your Stay <Accent>Starts</Accent> Here
+        How Can We <Accent>Help</Accent>
       </>
     ),
-    lead: "If MIS Private Residence feels like the kind of place you have been looking for, tell us when you would like to arrive.",
-    body: "Share your dates, number of guests and anything you would like us to know. Our team will take care of the rest.",
+    lead: "If there is something you would like to know about MIS Private Residence, our team is here to answer it.",
+    body: (link: React.ReactNode) => (
+      <>
+        This is our line for general enquiries — the house, the island, what a
+        stay here involves. Reserving dates happens on its own page: {link}.
+      </>
+    ),
+    bodyLink: "reserve your stay",
   },
   sr: {
     title: (
       <>
-        Vaš boravak <Accent>počinje</Accent> ovde
+        Kako možemo da <Accent>pomognemo</Accent>
       </>
     ),
-    lead: "Ako vam MIS Private Residence deluje kao mesto koje ste tražili, recite nam kada biste želeli da dođete.",
-    body: "Pošaljite nam datume, broj gostiju i sve što želite da znamo. O ostalom će se pobrinuti naš tim.",
+    lead: "Ako želite nešto da saznate o rezidenciji MIS Private Residence, naš tim je tu da odgovori.",
+    body: (link: React.ReactNode) => (
+      <>
+        Ovo je naša linija za opšte upite — o kući, ostrvu i tome kako izgleda
+        boravak kod nas. Rezervacija datuma ide preko svoje stranice: {link}.
+      </>
+    ),
+    bodyLink: "rezervišite boravak",
   },
 } as const;
 
@@ -42,7 +55,14 @@ export function Contact({ lang }: { lang: Lang }) {
             {t.lead}
           </p>
           <p className="text-lead mt-4 max-w-[46ch] text-ink-muted">
-            {t.body}
+            {t.body(
+              <AppLink
+                href={localePath(RESERVE_PATH, lang)}
+                className="text-ink underline underline-offset-4 transition-colors duration-(--dur-fast) hover:text-accent"
+              >
+                {t.bodyLink}
+              </AppLink>,
+            )}
           </p>
 
           <dl className="mt-14 space-y-8">

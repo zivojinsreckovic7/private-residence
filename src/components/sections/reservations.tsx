@@ -5,7 +5,7 @@ import { Magnetic } from "@/components/motion/magnetic";
 import { Reveal } from "@/components/motion/reveal";
 import { Section } from "@/components/ui/section";
 import { localePath, type Lang } from "@/lib/i18n";
-import { RESERVE_CTA } from "@/lib/site";
+import { RESERVE_CTA, RESERVE_PATH } from "@/lib/site";
 
 const COPY = {
   en: {
@@ -97,7 +97,7 @@ export function Reservations({ lang }: { lang: Lang }) {
 
         <Reveal delay={120}>
           <Magnetic className="mt-16 inline-block">
-            <Button href={localePath("/contact", lang)} size="lg" icon>
+            <Button href={localePath(RESERVE_PATH, lang)} size="lg" icon>
               {RESERVE_CTA[lang]}
             </Button>
           </Magnetic>

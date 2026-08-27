@@ -8,14 +8,26 @@ type FieldProps = {
   placeholder?: string;
   /** Renders a textarea instead of an input. */
   multiline?: boolean;
+  /** Controlled value. Pass `onChange` with it. */
+  value?: string;
+  onChange?: (value: string) => void;
+  /** Earliest acceptable value, for date and number controls. */
+  min?: string;
+  autoComplete?: string;
   className?: string;
 };
 
-const control =
+/**
+ * The control treatment, exported so bespoke controls that `Field` does not
+ * cover — the reservation page's select, for one — cannot drift from it.
+ */
+export const fieldControl =
   "rounded-surface w-full border border-line-strong bg-canvas px-4 py-3 " +
   "text-body text-ink placeholder:text-ink-subtle " +
   "transition-colors duration-(--dur-fast) " +
   "hover:border-ink-faint focus:border-accent focus:outline-none";
+
+const control = fieldControl;
 
 /**
  * Label above control, always. No placeholder-as-label: the placeholder is a
@@ -28,6 +40,10 @@ export function Field({
   required = false,
   placeholder,
   multiline = false,
+  value,
+  onChange,
+  min,
+  autoComplete,
   className,
 }: FieldProps) {
   return (
@@ -56,6 +72,10 @@ export function Field({
           type={type}
           required={required}
           placeholder={placeholder}
+          value={value}
+          onChange={onChange && ((event) => onChange(event.target.value))}
+          min={min}
+          autoComplete={autoComplete}
           className={control}
         />
       )}

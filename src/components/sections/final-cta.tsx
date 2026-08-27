@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Container } from "@/components/ui/container";
 import { Accent, Heading } from "@/components/ui/heading";
 import { localePath, type Lang } from "@/lib/i18n";
-import { RESERVE_CTA, site } from "@/lib/site";
+import { RESERVE_CTA, RESERVE_PATH, site } from "@/lib/site";
 
 const COPY = {
   en: {
@@ -104,7 +104,7 @@ export function FinalCta({ lang }: { lang: Lang }) {
                 {t.signoff}
               </p>
               <Magnetic className="mt-12 inline-block">
-                <Button href={localePath("/contact", lang)} size="lg" icon>
+                <Button href={localePath(RESERVE_PATH, lang)} size="lg" icon>
                   {RESERVE_CTA[lang]}
                 </Button>
               </Magnetic>

@@ -5,7 +5,7 @@ import { SiteLoader } from "@/components/layout/site-loader";
 import { SiteHeader } from "@/components/layout/site-header";
 import { cormorant, geist } from "@/lib/fonts";
 import { LANGS, LANG_TAGS, isLang, localePath } from "@/lib/i18n";
-import { alternates } from "@/lib/metadata";
+import { alternates, ogImages } from "@/lib/metadata";
 import { TAGLINE, site, siteTitle } from "@/lib/site";
 import "../globals.css";
 
@@ -38,6 +38,7 @@ export async function generateMetadata({
       // page shared to a social card should open in Serbian.
       url: `${site.url}${localePath("/", lang)}`,
       siteName: site.fullName,
+      images: ogImages(lang),
       locale: LANG_TAGS[lang].replace(/-/g, "_"),
       type: "website",
     },

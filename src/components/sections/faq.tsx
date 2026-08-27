@@ -4,7 +4,6 @@ import { Accent, Heading } from "@/components/ui/heading";
 import { Reveal } from "@/components/motion/reveal";
 import { Section } from "@/components/ui/section";
 import type { Lang } from "@/lib/i18n";
-import { site } from "@/lib/site";
 
 const COPY = {
   en: {
@@ -41,7 +40,8 @@ const COPY = {
       },
       {
         question: "How do I make a reservation?",
-        answer: `Send your enquiry directly to ${site.contact.reservations} with your preferred dates and guest information.`,
+        answer:
+          "Send your preferred dates and guest details from the reservations page. No payment is taken there, and we reply personally with availability and written terms, usually within 24 hours.",
       },
     ],
   },
@@ -79,7 +79,8 @@ const COPY = {
       },
       {
         question: "Kako da napravim rezervaciju?",
-        answer: `Pošaljite upit direktno na ${site.contact.reservations} sa željenim datumima i podacima o gostima.`,
+        answer:
+          "Pošaljite željene datume i podatke o gostima sa stranice za rezervacije. Tamo se ništa ne naplaćuje, a mi odgovaramo lično, sa dostupnošću i pisanim uslovima, obično u roku od 24 sata.",
       },
     ],
   },

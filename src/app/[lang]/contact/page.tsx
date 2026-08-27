@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { AppLink } from "@/components/ui/app-link";
 import { Reveal } from "@/components/motion/reveal";
 import { ContactForm } from "@/components/sections/contact-form";
 import { Container } from "@/components/ui/container";
@@ -7,33 +8,41 @@ import { Eyebrow } from "@/components/ui/eyebrow";
 import { FindUs } from "@/components/sections/find-us";
 import { Accent, Heading } from "@/components/ui/heading";
 import { Section } from "@/components/ui/section";
-import { isLang } from "@/lib/i18n";
+import { isLang, localePath } from "@/lib/i18n";
 import { alternates } from "@/lib/metadata";
-import { SHARED, site } from "@/lib/site";
+import { RESERVE_PATH, SHARED, site } from "@/lib/site";
 
 const COPY = {
   en: {
     title: "Contact",
-    description: `Enquire about dates, rates and availability at ${site.fullName}.`,
+    description: `General enquiries and contact details for ${site.fullName}.`,
     eyebrow: "Contact",
     heading: (
       <>
         Get in <Accent>Touch</Accent>
       </>
     ),
-    lead: "Tell us your dates and who is travelling with you. Every enquiry is read and answered by our team, usually within 24 hours.",
+    lead: "This is our general enquiry line. Ask us anything about the residence, the island or what a stay here involves — every enquiry is read and answered by our team, usually within 24 hours.",
+    reservations: (link: React.ReactNode) => (
+      <>Reservations are handled separately. To check availability or reserve a stay, {link}.</>
+    ),
+    reservationsLink: "start on the reservations page",
     direct: "Or reach us directly",
   },
   sr: {
     title: "Kontakt",
-    description: `Pošaljite upit o datumima, cenama i dostupnosti u rezidenciji ${site.fullName}.`,
+    description: `Opšti upiti i kontakt podaci rezidencije ${site.fullName}.`,
     eyebrow: "Kontakt",
     heading: (
       <>
         Javite <Accent>nam se</Accent>
       </>
     ),
-    lead: "Recite nam svoje datume i ko putuje sa vama. Svaki upit naš tim pročita i na njega odgovori, obično u roku od 24 sata.",
+    lead: "Ovo je naša linija za opšte upite. Pitajte nas sve o rezidenciji, ostrvu ili tome kako izgleda boravak kod nas — svaki upit naš tim pročita i na njega odgovori, obično u roku od 24 sata.",
+    reservations: (link: React.ReactNode) => (
+      <>Rezervacije se obrađuju posebno. Za proveru dostupnosti ili rezervaciju boravka {link}.</>
+    ),
+    reservationsLink: "krenite sa stranice za rezervacije",
     direct: "Ili nam se obratite direktno",
   },
 } as const;
@@ -53,7 +62,9 @@ export async function generateMetadata({
 
 /**
  * The contact page is a utility page, so it is built as one: a heading, the
- * enquiry form, and the ways to reach us directly, in that order. No pinned
+ * general enquiry form, and the ways to reach us directly, in that order. It
+ * is not the booking route: reservations are their own channel, and the copy
+ * here sends them to the reservations address rather than the form. No pinned
  * scenes and no photography. The premium comes from the type, the spacing and
  * the hairlines the rest of the site already uses.
  */
@@ -81,6 +92,18 @@ export default async function ContactPage({
           <Reveal delay={90}>
             <p className="text-lead mt-7 max-w-[54ch] text-ink-muted">
               {t.lead}
+            </p>
+          </Reveal>
+          <Reveal delay={140}>
+            <p className="text-body mt-5 max-w-[54ch] text-ink-subtle">
+              {t.reservations(
+                <AppLink
+                  href={localePath(RESERVE_PATH, lang)}
+                  className="text-ink underline underline-offset-4 transition-colors duration-(--dur-fast) hover:text-accent"
+                >
+                  {t.reservationsLink}
+                </AppLink>,
+              )}
             </p>
           </Reveal>
         </Container>

@@ -1,5 +1,21 @@
 import type { Metadata } from "next";
+import { photo } from "@/lib/gallery";
 import { LANG_TAGS, localePath, type Lang } from "@/lib/i18n";
+
+/** The photograph every social card carries. */
+const OG_PHOTO = "/gallery/exterior/villa-full-view-with-pool.jpeg";
+
+/**
+ * The social card image, described in the language of the page sharing it.
+ *
+ * Page-level `openGraph` replaces the layout's rather than merging into it, so
+ * every page that writes its own has to include this. The description comes
+ * from the gallery manifest, like every other use of this photograph.
+ */
+export function ogImages(lang: Lang): NonNullable<Metadata["openGraph"]>["images"] {
+  const { src, alt } = photo(OG_PHOTO, lang);
+  return [{ url: src, width: 1600, height: 1067, alt }];
+}
 
 /**
  * The canonical URL for a page in the language being rendered, plus the

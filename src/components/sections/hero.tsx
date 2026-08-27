@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Container } from "@/components/ui/container";
 import { Accent, Heading } from "@/components/ui/heading";
 import { localePath, type Lang } from "@/lib/i18n";
-import { RESERVE_CTA, site } from "@/lib/site";
+import { RESERVE_CTA, RESERVE_PATH, site } from "@/lib/site";
 
 /**
  * The three captions, in the order the loop finds them. Adding one here means
@@ -416,7 +416,7 @@ export function Hero({ lang }: { lang: Lang }) {
             {t.lead}
           </p>
           <div className="mt-10 flex flex-wrap justify-center gap-3">
-            <Button href={localePath("/contact", lang)} size="lg" icon>
+            <Button href={localePath(RESERVE_PATH, lang)} size="lg" icon>
               {RESERVE_CTA[lang]}
             </Button>
             <Button href="#residence" size="lg" variant="onDark">

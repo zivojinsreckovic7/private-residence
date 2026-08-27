@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Wordmark } from "@/components/ui/wordmark";
 import { cn } from "@/lib/cn";
 import { LANGS, LANG_NAMES, LANG_TAGS, localePath, type Lang } from "@/lib/i18n";
-import { RESERVE_CTA, navigation, site } from "@/lib/site";
+import { RESERVE_CTA, RESERVE_PATH, navigation, site } from "@/lib/site";
 
 const COPY = {
   en: { home: "home", open: "Open menu", close: "Close menu", language: "Language" },
@@ -85,7 +85,7 @@ export function SiteHeader({ lang }: { lang: Lang }) {
             />
 
             <Magnetic className="hidden sm:block">
-              <Button href={localePath("/contact", lang)} icon>
+              <Button href={localePath(RESERVE_PATH, lang)} icon>
                 {RESERVE_CTA[lang]}
               </Button>
             </Magnetic>
@@ -250,7 +250,7 @@ function MobileMenu({
           )}
         >
           <Button
-            href={localePath("/contact", lang)}
+            href={localePath(RESERVE_PATH, lang)}
             size="lg"
             icon
             onClick={onClose}

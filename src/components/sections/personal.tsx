@@ -5,6 +5,7 @@ import { Container } from "@/components/ui/container";
 import { Accent, Heading } from "@/components/ui/heading";
 import { Section } from "@/components/ui/section";
 import { localePath, type Lang } from "@/lib/i18n";
+import { RESERVE_PATH } from "@/lib/site";
 
 /**
  * The CTA here is "Plan Your Stay" rather than the site's one booking label.
@@ -57,7 +58,7 @@ export function Personal({ lang }: { lang: Lang }) {
           </Reveal>
           <Reveal delay={200}>
             <Magnetic className="mt-12 inline-block">
-              <Button href={localePath("/contact", lang)} icon size="lg">
+              <Button href={localePath(RESERVE_PATH, lang)} icon size="lg">
                 {t.cta}
               </Button>
             </Magnetic>

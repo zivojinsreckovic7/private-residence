@@ -36,6 +36,8 @@ src/
   proxy.ts             locale routing; see "Two languages" below
   app/                 routes only
     globals.css        design tokens + the handful of global rules
+    sitemap.ts         every indexable URL, both languages, with hreflang
+    robots.ts          allows everything; points at the sitemap
     favicon.ico        the crest, 16/32/48; see scripts/make-icons.py
     icon.png           the crest, 512
     apple-icon.png     the crest, 180
@@ -43,7 +45,8 @@ src/
       layout.tsx       fonts, metadata, header and footer chrome
       page.tsx         home
       about/           the long-form about page, written for search
-      contact/         the enquiry page
+      contact/         the general enquiry page
+      reservations/    the booking request, where every reserve CTA lands
       experiences/     what a stay is like, plus the guest quotes
       gallery/         the full photography set
       styleguide/      living specimen of the system, noindex, not linked
@@ -54,7 +57,7 @@ src/
     sections/          one file per landing section   (Hero, Cyprus, Faq, ...)
   lib/
     i18n.ts            languages, `localePath()`, the copy convention
-    metadata.ts        canonical + hreflang for a page
+    metadata.ts        canonical + hreflang for a page, and the social card
     ...                fonts, brand config, helpers
 scripts/
   make-icons.py        regenerates the three app icons from the crest
@@ -130,11 +133,36 @@ only in the mobile menu.
 **Every page carries `alternates()`** from `lib/metadata.ts`: a canonical for
 the edition being rendered plus the `hreflang` pair and `x-default` (English).
 A page that sets its own `openGraph` must localise `url` too — the layout's is
-the one for `/` and `/sr`.
+the one for `/` and `/sr` — and must include `ogImages(lang)`, because a page's
+`openGraph` replaces the layout's rather than merging into it.
 
 **Not translated, deliberately:** the address (written the way the post office
 and a maps app need it), email addresses, the brand name, and `/styleguide`,
 which is an internal noindex page.
+
+# Crawl hygiene
+
+The site is meant to be fully indexable, and it was verified that way: every
+internal link on all twelve pages returns 200 with no redirect, and the twelve
+sitemap URLs are exactly the twelve pages a crawler reaches by following
+links. Keep it that way.
+
+- **`app/sitemap.ts` is the list of indexable routes.** It is written out there
+  rather than derived from `navigation`, which is a mixed list that carries a
+  fragment and leaves pages out. Add a page, add it there.
+- **`/styleguide` is the one page kept out**, by `robots: { index: false }` on
+  the page itself and by its absence from the sitemap. It is deliberately not
+  disallowed in `robots.txt`: a crawler that cannot fetch it cannot read the
+  tag.
+- **No internal link may be absolute.** `https://www.misprivateresidence.com/…`
+  written into a component leaves the app on click and, from `/sr`, lands in
+  English. Use `localePath()`. `site.url` is for metadata only.
+- **Never link a route that does not exist yet.** The footer listed Privacy
+  Policy, Terms & Conditions and Reservation Terms before those pages were
+  written, and all three 404'd; the list is gone until the routes are real.
+- The redirects that do exist are intentional and single-hop: `/en/...` back to
+  the unprefixed form, and Next's own trailing-slash normalisation. Nothing
+  internal points at either shape, so no crawl path goes through a redirect.
 
 # Theme notes
 
@@ -182,8 +210,9 @@ another chapter. Do not "correct" it back.
 straight to the DOM, and the animation itself lives in `globals.css` behind
 `prefers-reduced-motion`.
 
-**z-index scale.** Mobile menu overlay 30, header 40, loading curtain 50,
-grain 60. Nothing else claims a layer. The header sits *above* the mobile
+**z-index scale.** The reservation page's phone action bar 20, mobile menu
+overlay 30, header 40, loading curtain 50, grain 60. Nothing else claims a
+layer. The header sits *above* the mobile
 overlay so its close control stays reachable, and the grain sits above the
 curtain so the paper texture is there from the first frame.
 
@@ -198,18 +227,41 @@ the unit we iterate on.
 Repeating items inside a section (highlights, destination cards, FAQ entries,
 day parts) are a `const` array at the top of that section's file.
 
-**Nav anchors.** `#residence`, `#experience`, `#cyprus`. Keep them on the
-sections the nav points at. The nav links to them as `/#residence` and so on,
-so the nav still works from the standalone pages, where a bare fragment would
-have nothing to scroll to.
+**Nav anchors.** `#residence` is the only one left in the nav. Keep it on the
+section the nav points at. The nav links to it as `/#residence`, root-relative,
+so it still works from the standalone pages, where a bare fragment would have
+nothing to scroll to — and `localePath()`'s fragment case exists for it, so
+check that path is still exercised before removing the last one.
 
-**Contact, About, Gallery and Experience are routes, not anchors.** Every
-reservation CTA points at `/contact`; the nav's other three point at `/about`,
-`/gallery` and `/experiences`. The landing page keeps its own `#contact`,
-`#about`, `#gallery` and `#experience` sections as its own moments, but nothing
-links to those anchors any more: the sections are the page's argument, the
-routes are what search and the nav address. Only `#residence`, `#experience`'s
-neighbours `#cyprus` and the rest are still nav targets.
+**Contact, About, Gallery and Experience are routes, not anchors.** The nav
+points at `/about`, `/gallery`, `/experiences` and `/contact`, and every
+reservation CTA at `/reservations`. The landing page keeps its own `#contact`,
+`#about`, `#gallery`, `#experience` and `#cyprus` sections as its own moments,
+but nothing links to those anchors any more: the sections are the page's
+argument, the routes are what search and the nav address. `#residence` is the
+one anchor still addressed from the nav.
+
+**`/reservations` takes the booking, `/contact` takes everything else.** Every
+reserve CTA on the site — header, hero, the three `CtaBanner`s, `Reservations`,
+`Personal`, `FinalCta`, the about page — points at `RESERVE_PATH` from
+`lib/site.ts`, never at a route written out at the call site: the label and its
+destination are one decision, and this route has already moved once. The
+contact page, the reused `<Contact>` section and `<ContactForm>` say in copy
+that they are the general line and link across to `/reservations` for dates.
+
+**The reservation page is a checkout, and is built like one**, not like the
+rest of the site: no pinned scene, one photograph, and the request itself above
+the fold on a laptop. `sections/reservation-checkout.tsx` is the whole unit —
+the form and the summary that reads back from it — in one client component,
+because the two share state. Below it the page answers what is actually in the
+way of sending: what happens next, who you are writing to, and what asking
+costs you. It claims no price, no review score and no capacity, because the
+site publishes none of those; every trust signal on it is verifiable.
+
+Like `<ContactForm>`, it is wired to no inbox. Rather than swallow the typing,
+the submit writes the whole request into a `mailto:` and hands it back, saying
+plainly that nothing has been sent. Replace the body of `onSubmit` when there
+is an endpoint.
 
 `/experiences` composes the landing page's own experience sections rather than
 restating them — `Experience`, `Occasions`, `Testimonials`, `Personal` — so
@@ -268,7 +320,8 @@ its `padding-left` (both `--edge`), or mandatory snapping aligns the first
 frame to the scrollport and scrolls the padding away, cutting the frame off
 against the window edge.
 
-**The reservation is offered three times on the way down.** The page is long,
+**The reservation is offered three times on the way down**, all of it landing
+on `/reservations`. The page is long,
 so `CtaBanner` sits after `Highlights`, after `Spaces` and after `Gallery`, in
 addition to the CTAs already in the hero, `Personal`, `Reservations` and
 `FinalCta`. Each placement carries its own line, written to follow the section
@@ -295,8 +348,9 @@ so nothing invented can ship by accident. It now renders on the landing page
 *and* `/experiences`, so there are two places to check. Replace with real
 reviews, or delete the section from both — never fill it in.
 
-**One label per intent.** `RESERVE_CTA` in `lib/site.ts` is the booking label,
-used in the header, hero, reservations and final CTA. The brief also specifies
+**One label per intent.** `RESERVE_CTA` in `lib/site.ts` is the booking label
+and `RESERVE_PATH` beside it is where it goes, used in the header, hero,
+reservations and final CTA. The brief also specifies
 "Plan Your Stay" on the personal-experience section, which points at the same
 place; that is the client's wording, kept deliberately.
 
@@ -433,6 +487,10 @@ itself; against anything else the JPEG shows a box.
   in `src/lib/cn.ts`.
 - Icons come from `@phosphor-icons/react/ssr` at `weight="light"`. One family,
   no hand-rolled SVG.
+- **Cormorant sets oldstyle figures by default**, so a serif `01` reads as
+  "oi". Any serif numeral that has to read as a number wants
+  `[font-feature-settings:'lnum']`; the reservation page's step numbers carry
+  it.
 - `public/logo.jpeg` is a raster on a cream ground, so it cannot sit on the
   white page. `<Wordmark>` type-sets the mark in Cormorant instead. Swap in the
   crest SVG when it exists; the component API stays the same.

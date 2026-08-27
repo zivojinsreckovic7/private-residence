@@ -11,8 +11,8 @@ import { PhotoStrip } from "@/components/ui/photo-strip";
 import { Section } from "@/components/ui/section";
 import { photo } from "@/lib/gallery";
 import { localePath, LANG_TAGS, isLang, type Lang } from "@/lib/i18n";
-import { alternates } from "@/lib/metadata";
-import { RESERVE_CTA, site } from "@/lib/site";
+import { alternates, ogImages } from "@/lib/metadata";
+import { RESERVE_CTA, RESERVE_PATH, site } from "@/lib/site";
 
 /**
  * The reading column. The page sits in the full-width container so its
@@ -278,6 +278,7 @@ export async function generateMetadata({
       title: t.ogTitle,
       description: t.description,
       url: `${site.url}${localePath("/about", lang)}`,
+      images: ogImages(lang),
       type: "article",
     },
   };
@@ -539,7 +540,7 @@ export default async function AboutPage({ params }: PageProps<"/[lang]/about">) 
 
             <Reveal delay={240}>
               <Button
-                href={localePath("/contact", lang)}
+                href={localePath(RESERVE_PATH, lang)}
                 size="lg"
                 icon
                 className="mt-12"

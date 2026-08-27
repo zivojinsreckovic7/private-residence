@@ -65,6 +65,16 @@ export const RESERVE_CTA: Copy<string> = {
 };
 
 /**
+ * Where every booking CTA points. Written once here rather than at each call
+ * site: the label and its destination are one decision, and this route has
+ * already moved once (it was `/contact` before the reservations page existed).
+ *
+ * Unprefixed and in the English form, like every other href on the site —
+ * `localePath()` adds the `/sr` prefix.
+ */
+export const RESERVE_PATH = "/reservations";
+
+/**
  * Primary navigation. Kept short so the nav stays on one line at desktop.
  *
  * Hrefs are written unprefixed and in the English form: they are the site's
@@ -80,20 +90,17 @@ export const RESERVE_CTA: Copy<string> = {
 export const navigation = [
   { href: "/#residence", label: { en: "Residence", sr: "Rezidencija" } },
   { href: "/experiences", label: { en: "Experience", sr: "Doživljaj" } },
-  { href: "/#cyprus", label: { en: "Cyprus", sr: "Kipar" } },
   { href: "/gallery", label: { en: "Gallery", sr: "Galerija" } },
   { href: "/about", label: { en: "About", sr: "O nama" } },
   { href: "/contact", label: { en: "Contact", sr: "Kontakt" } },
 ] as const;
 
-export const legalLinks = [
-  { href: "/privacy", label: { en: "Privacy Policy", sr: "Politika privatnosti" } },
-  { href: "/terms", label: { en: "Terms & Conditions", sr: "Uslovi korišćenja" } },
-  {
-    href: "/reservation-terms",
-    label: { en: "Reservation Terms", sr: "Uslovi rezervacije" },
-  },
-] as const;
+/*
+ * The footer's legal links are deliberately absent. Privacy Policy, Terms &
+ * Conditions and Reservation Terms were listed here before the pages existed,
+ * so every one of them 404'd and was crawled as a broken link. Put the list
+ * back when the routes are real, not before.
+ */
 
 /** Labels that appear in the chrome and in more than one section. */
 export const SHARED: Copy<{
