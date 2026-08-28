@@ -1,3 +1,4 @@
+import { recordReservation } from "@/lib/crm";
 import { isLang, type Lang } from "@/lib/i18n";
 import {
   guestMessage,
@@ -18,6 +19,10 @@ import { site } from "@/lib/site";
  * failure fails the call, so the form can offer the guest a way to send it by
  * hand. The one back to the guest is a courtesy; if it fails the request has
  * still arrived, so it is logged and swallowed rather than shown as an error.
+ *
+ * A third thing leaves at the same time: the hand-off to the CRM. It runs
+ * alongside the first message rather than after it, so it costs the guest no
+ * latency, and it cannot fail the call — see `lib/crm.ts` for why.
  */
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -80,14 +85,18 @@ export async function POST(request: Request) {
   const reservation = parsed.request;
   const team = teamMessage(reservation);
 
-  const sent = await send(key, {
-    from: site.contact.sender,
-    to: [site.contact.reservations],
-    reply_to: [reservation.email],
-    subject: team.subject,
-    html: team.html,
-    text: team.text,
-  });
+  // Both start together. Only the message to the residence can fail the call.
+  const [sent] = await Promise.all([
+    send(key, {
+      from: site.contact.sender,
+      to: [site.contact.reservations],
+      reply_to: [reservation.email],
+      subject: team.subject,
+      html: team.html,
+      text: team.text,
+    }),
+    recordReservation(reservation),
+  ]);
 
   if (!sent) return json({ ok: false, error: "send_failed" }, 502);
 
