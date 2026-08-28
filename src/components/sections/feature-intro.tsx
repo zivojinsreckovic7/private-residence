@@ -74,7 +74,7 @@ export function FeatureIntro({ lang }: { lang: Lang }) {
               className="mt-16 max-w-[26rem] lg:mt-auto"
             >
               <Figure
-                src="/gallery/details/poolside-tray-and-pomegranates.jpeg"
+                src="/gallery/details/poolside-tray-and-pomegranates.webp"
                 alt={t.alt}
                 aspect="aspect-[4/3]"
                 sizes="(min-width: 1024px) 26rem, 100vw"

@@ -35,7 +35,7 @@ const COPY = {
 const FRAMES = [
   {
     label: { en: "Residence", sr: "Rezidencija" },
-    src: "/gallery/exterior/villa-facade-from-pool.jpeg",
+    src: "/gallery/exterior/villa-facade-from-pool.webp",
     alt: {
       en: "The villa facade seen across the pool.",
       sr: "Fasada vile viđena preko bazena.",
@@ -44,7 +44,7 @@ const FRAMES = [
   },
   {
     label: { en: "Interiors", sr: "Enterijeri" },
-    src: "/gallery/living/living-room-and-staircase.jpeg",
+    src: "/gallery/living/living-room-and-staircase.webp",
     alt: {
       en: "The living room with the staircase behind it.",
       sr: "Dnevna soba sa stepeništem u pozadini.",
@@ -53,7 +53,7 @@ const FRAMES = [
   },
   {
     label: { en: "Pool", sr: "Bazen" },
-    src: "/gallery/pool-terrace/pool-through-bougainvillea.jpeg",
+    src: "/gallery/pool-terrace/pool-through-bougainvillea.webp",
     alt: {
       en: "The pool framed by bougainvillea.",
       sr: "Bazen uokviren bugenvilijom.",
@@ -62,7 +62,7 @@ const FRAMES = [
   },
   {
     label: { en: "Kitchen", sr: "Kuhinja" },
-    src: "/gallery/kitchen/kitchen-island-and-display-shelves.jpeg",
+    src: "/gallery/kitchen/kitchen-island-and-display-shelves.webp",
     alt: {
       en: "The kitchen island with display shelving behind it.",
       sr: "Kuhinjsko ostrvo sa policama u pozadini.",
@@ -71,7 +71,7 @@ const FRAMES = [
   },
   {
     label: { en: "Outdoor Living", sr: "Život na otvorenom" },
-    src: "/gallery/pool-terrace/pool-terrace-lounge-and-dining.jpeg",
+    src: "/gallery/pool-terrace/pool-terrace-lounge-and-dining.webp",
     alt: {
       en: "Lounge seating and a dining table on the pool terrace.",
       sr: "Sedeći deo i trpezarijski sto na terasi uz bazen.",
@@ -80,7 +80,7 @@ const FRAMES = [
   },
   {
     label: { en: "Bedrooms", sr: "Spavaće sobe" },
-    src: "/gallery/bedrooms/twin-bedroom-with-balcony.jpeg",
+    src: "/gallery/bedrooms/twin-bedroom-with-balcony.webp",
     alt: {
       en: "A twin bedroom opening onto its own balcony.",
       sr: "Soba sa dva ležaja koja se otvara ka sopstvenom balkonu.",
@@ -89,7 +89,7 @@ const FRAMES = [
   },
   {
     label: { en: "Details", sr: "Detalji" },
-    src: "/gallery/details/poolside-table-juice-and-fruit.jpeg",
+    src: "/gallery/details/poolside-table-juice-and-fruit.webp",
     alt: {
       en: "Juice and fruit laid out on a poolside table.",
       sr: "Sok i voće posluženi na stolu uz bazen.",
@@ -98,7 +98,7 @@ const FRAMES = [
   },
   {
     label: { en: "Evenings", sr: "Večeri" },
-    src: "/gallery/exterior/villa-facade-outdoor-cinema.jpeg",
+    src: "/gallery/exterior/villa-facade-outdoor-cinema.webp",
     alt: {
       en: "The villa facade with the outdoor cinema set up in front of it.",
       sr: "Fasada vile sa bioskopom na otvorenom postavljenim ispred nje.",

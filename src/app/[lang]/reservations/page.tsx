@@ -14,7 +14,7 @@ import { alternates, ogImages } from "@/lib/metadata";
 import { RESERVE_PATH, site } from "@/lib/site";
 
 /** The photograph the summary card carries. Described once, in the manifest. */
-const HERO_PHOTO = "/gallery/exterior/villa-full-view-with-pool.jpeg";
+const HERO_PHOTO = "/gallery/exterior/villa-full-view-with-pool.webp";
 
 const COPY = {
   en: {

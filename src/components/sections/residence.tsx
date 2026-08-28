@@ -91,7 +91,7 @@ export function Residence({ lang }: { lang: Lang }) {
             className="absolute inset-0 motion-reduce:scale-100"
           >
             <Image
-              src="/gallery/living/living-and-dining-toward-pool.jpeg"
+              src="/gallery/living/living-and-dining-toward-pool.webp"
               alt={t.alt}
               fill
               sizes="100vw"

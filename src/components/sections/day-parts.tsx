@@ -27,7 +27,7 @@ const PARTS: readonly Part[] = [
     label: { en: "Morning", sr: "Jutro" },
     heading: { en: "Mornings, ", sr: "Jutra bez " },
     accent: { en: "Unhurried", sr: "žurbe" },
-    image: "/gallery/details/outdoor-dining-through-foliage.jpeg",
+    image: "/gallery/details/outdoor-dining-through-foliage.webp",
     alt: {
       en: "The outdoor dining table seen through foliage in the morning.",
       sr: "Spoljni trpezarijski sto viđen kroz zelenilo u jutarnjim satima.",
@@ -53,7 +53,7 @@ const PARTS: readonly Part[] = [
     label: { en: "Day", sr: "Dan" },
     heading: { en: "Days Without a ", sr: "Dani bez " },
     accent: { en: "Schedule", sr: "rasporeda" },
-    image: "/gallery/pool-terrace/pool-from-covered-lounge.jpeg",
+    image: "/gallery/pool-terrace/pool-from-covered-lounge.webp",
     alt: {
       en: "The pool seen from the shade of the covered lounge.",
       sr: "Bazen viđen iz hlada natkrivenog salona.",
@@ -79,7 +79,7 @@ const PARTS: readonly Part[] = [
     label: { en: "Evening", sr: "Veče" },
     heading: { en: "Stay for ", sr: "Ostanite zbog " },
     accent: { en: "Sunset", sr: "zalaska" },
-    image: "/gallery/pool-terrace/pool-outdoor-cinema-screen.jpeg",
+    image: "/gallery/pool-terrace/pool-outdoor-cinema-screen.webp",
     alt: {
       en: "The outdoor cinema screen standing beside the pool at dusk.",
       sr: "Platno bioskopa na otvorenom pored bazena u sumrak.",

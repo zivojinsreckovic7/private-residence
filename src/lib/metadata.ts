@@ -3,7 +3,7 @@ import { photo } from "@/lib/gallery";
 import { LANG_TAGS, localePath, type Lang } from "@/lib/i18n";
 
 /** The photograph every social card carries. */
-const OG_PHOTO = "/gallery/exterior/villa-full-view-with-pool.jpeg";
+const OG_PHOTO = "/gallery/exterior/villa-full-view-with-pool.webp";
 
 /**
  * The social card image, described in the language of the page sharing it.

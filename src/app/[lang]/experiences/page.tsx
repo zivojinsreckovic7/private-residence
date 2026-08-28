@@ -79,7 +79,7 @@ export default async function ExperiencesPage({
         eyebrow={t.eyebrow}
         title={t.heading}
         lead={t.lead}
-        src="/gallery/pool-terrace/pool-terrace-lounge-and-dining.jpeg"
+        src="/gallery/pool-terrace/pool-terrace-lounge-and-dining.webp"
         alt={t.alt}
       />
 

@@ -3,7 +3,7 @@
 Needs Pillow, which is not a project dependency: this is run by hand when the
 crest artwork changes, not as part of a build.
 
-public/logo-mark.jpg carries the full lockup: crest, MS monogram, then the
+public/logo-mark.webp carries the full lockup: crest, MS monogram, then the
 "PRIVATE RESIDENCE / CYPRUS" wordmark under a rule. The wordmark is illegible
 much below 96px, so no icon carries it.
 
@@ -14,7 +14,7 @@ so that one size is cut to the monogram alone and set larger in the frame.
 """
 from PIL import Image, ImageFilter
 
-SRC = "public/logo-mark.jpg"
+SRC = "public/logo-mark.webp"
 # Measured on the source. FULL is the crest and monogram, above the gold rule;
 # TIGHT is the near-black monogram alone.
 FULL = (179, 16, 529, 511)

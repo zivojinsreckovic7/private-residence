@@ -356,7 +356,7 @@ export function Hero({ lang }: { lang: Lang }) {
           {/* The floor. If the video cannot paint a frame, this shows through
               instead of black, so the worst case is a still photograph. */}
           <Image
-            src="/hero/walkthrough-poster.jpg"
+            src="/hero/walkthrough-poster.webp"
             alt=""
             fill
             priority
@@ -366,7 +366,7 @@ export function Hero({ lang }: { lang: Lang }) {
 
           <video
             ref={videoRef}
-            poster="/hero/walkthrough-poster.jpg"
+            poster="/hero/walkthrough-poster.webp"
             preload="auto"
             muted
             playsInline

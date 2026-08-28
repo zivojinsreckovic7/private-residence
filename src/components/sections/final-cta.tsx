@@ -73,7 +73,7 @@ export function FinalCta({ lang }: { lang: Lang }) {
           className="absolute inset-0 will-change-transform motion-reduce:scale-100"
         >
           <Image
-            src="/gallery/pool-terrace/pool-and-terrace-from-house.jpeg"
+            src="/gallery/pool-terrace/pool-and-terrace-from-house.webp"
             alt={t.alt}
             fill
             sizes="100vw"

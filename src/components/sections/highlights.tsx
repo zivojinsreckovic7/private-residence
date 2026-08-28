@@ -39,7 +39,7 @@ const HIGHLIGHTS = [
       en: "A private setting for morning swims, long afternoons and evenings beneath the Cyprus sky.",
       sr: "Privatan prostor za jutarnje plivanje, duga popodneva i večeri pod kiparskim nebom.",
     },
-    image: "/gallery/pool-terrace/pool-lengthwise-to-villa.jpeg",
+    image: "/gallery/pool-terrace/pool-lengthwise-to-villa.webp",
     alt: {
       en: "The pool running the length of the terrace toward the villa.",
       sr: "Bazen koji se pruža duž terase prema vili.",
@@ -54,7 +54,7 @@ const HIGHLIGHTS = [
       en: "Open living spaces connect naturally with the exterior, creating a seamless flow throughout the residence.",
       sr: "Otvoreni dnevni prostori prirodno se povezuju sa spoljašnjim, stvarajući neprekinut tok kroz celu rezidenciju.",
     },
-    image: "/gallery/living/living-room-toward-pool.jpeg",
+    image: "/gallery/living/living-room-toward-pool.webp",
     alt: {
       en: "The living room looking out through open glass doors to the pool.",
       sr: "Dnevna soba sa pogledom kroz otvorena staklena vrata na bazen.",
@@ -69,7 +69,7 @@ const HIGHLIGHTS = [
       en: "Contemporary design, considered materials and a calm, understated approach to luxury.",
       sr: "Savremen dizajn, pažljivo birani materijali i smiren, nenametljiv pristup luksuzu.",
     },
-    image: "/gallery/kitchen/kitchen-island-and-display-shelves.jpeg",
+    image: "/gallery/kitchen/kitchen-island-and-display-shelves.webp",
     alt: {
       en: "The kitchen island with display shelving behind it.",
       sr: "Kuhinjsko ostrvo sa policama u pozadini.",
@@ -84,7 +84,7 @@ const HIGHLIGHTS = [
       en: "Room to relax, dine and spend the day entirely at your own pace.",
       sr: "Prostor za odmor, obedovanje i dan proveden potpuno vašim tempom.",
     },
-    image: "/gallery/pool-terrace/terrace-hanging-chair-and-dining.jpeg",
+    image: "/gallery/pool-terrace/terrace-hanging-chair-and-dining.webp",
     alt: {
       en: "A hanging chair and outdoor dining table on the terrace.",
       sr: "Viseća fotelja i spoljni trpezarijski sto na terasi.",
@@ -99,7 +99,7 @@ const HIGHLIGHTS = [
       en: "Beautifully proportioned spaces created for both shared moments and complete relaxation.",
       sr: "Lepo proporcionisani prostori stvoreni i za zajedničke trenutke i za potpuno opuštanje.",
     },
-    image: "/gallery/living/living-room-sectional-wide.jpeg",
+    image: "/gallery/living/living-room-sectional-wide.webp",
     alt: {
       en: "The full width of the living room and its sectional sofa.",
       sr: "Cela širina dnevne sobe sa ugaonom garniturom.",
@@ -114,7 +114,7 @@ const HIGHLIGHTS = [
       en: "A residence that is yours to experience without crowds, shared spaces or interruption.",
       sr: "Rezidencija koju doživljavate bez gužve, zajedničkih prostora i ometanja.",
     },
-    image: "/gallery/exterior/villa-full-view-with-pool.jpeg",
+    image: "/gallery/exterior/villa-full-view-with-pool.webp",
     alt: {
       en: "The villa seen in full from across the pool.",
       sr: "Vila u punom pogledu sa druge strane bazena.",

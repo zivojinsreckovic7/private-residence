@@ -84,7 +84,7 @@ export function Location({ lang }: { lang: Lang }) {
             className="rounded-surface aspect-[5/4] bg-canvas lg:aspect-[16/11]"
           >
             <Image
-              src="/gallery/exterior/villa-facade-pool-bougainvillea.jpeg"
+              src="/gallery/exterior/villa-facade-pool-bougainvillea.webp"
               alt={t.alt}
               fill
               sizes="(min-width: 1024px) 65vw, 100vw"

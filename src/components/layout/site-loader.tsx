@@ -107,7 +107,7 @@ export function SiteLoader() {
 
     void Promise.all([
       document.fonts ? document.fonts.ready : Promise.resolve(),
-      preload("/hero/walkthrough-poster.jpg"),
+      preload("/hero/walkthrough-poster.webp"),
     ]).then(markReady);
     timers.push(
       setTimeout(markReady, Math.max(0, CAP_MS - performance.now())),
@@ -124,7 +124,7 @@ export function SiteLoader() {
     <div className="curtain" data-state={state} aria-hidden>
       <div className="curtain-mark flex flex-col items-center">
         <Image
-          src="/logo-mark.jpg"
+          src="/logo-mark.webp"
           alt=""
           width={716}
           height={718}

@@ -87,7 +87,7 @@ export default async function GalleryPage({
         eyebrow={t.eyebrow}
         title={t.heading}
         lead={t.lead}
-        src="/gallery/pool-terrace/pool-lengthwise-to-villa.jpeg"
+        src="/gallery/pool-terrace/pool-lengthwise-to-villa.webp"
         alt={t.alt}
       />
 

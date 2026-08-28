@@ -298,12 +298,12 @@ export default async function AboutPage({ params }: PageProps<"/[lang]/about">) 
   const t = COPY[lang];
   const [villa, design, privacy, cyprus, stays] = t.sections;
   const strip = [
-    "/gallery/exterior/villa-facade-pool-bougainvillea.jpeg",
-    "/gallery/pool-terrace/pool-terrace-lounge-and-dining.jpeg",
-    "/gallery/living/living-room-sectional-wide.jpeg",
-    "/gallery/bedrooms/double-bedroom-with-balcony.jpeg",
-    "/gallery/bedrooms/twin-bedroom-with-balcony.jpeg",
-    "/gallery/bathrooms/bathroom-walk-in-shower.jpeg",
+    "/gallery/exterior/villa-facade-pool-bougainvillea.webp",
+    "/gallery/pool-terrace/pool-terrace-lounge-and-dining.webp",
+    "/gallery/living/living-room-sectional-wide.webp",
+    "/gallery/bedrooms/double-bedroom-with-balcony.webp",
+    "/gallery/bedrooms/twin-bedroom-with-balcony.webp",
+    "/gallery/bathrooms/bathroom-walk-in-shower.webp",
   ].map((src) => photo(src, lang));
 
   return (
@@ -358,7 +358,7 @@ export default async function AboutPage({ params }: PageProps<"/[lang]/about">) 
         <Container>
           <Reveal variant="mask" as="figure">
             <Figure
-              {...photo("/gallery/exterior/villa-full-view-with-pool.jpeg", lang)}
+              {...photo("/gallery/exterior/villa-full-view-with-pool.webp", lang)}
               aspect="aspect-[21/9]"
               sizes="(min-width: 1240px) 1240px, 100vw"
               priority
@@ -375,7 +375,7 @@ export default async function AboutPage({ params }: PageProps<"/[lang]/about">) 
             <Reveal variant="mask" as="figure">
               <Figure
                 {...photo(
-                  "/gallery/details/outdoor-dining-through-foliage.jpeg",
+                  "/gallery/details/outdoor-dining-through-foliage.webp",
                   lang,
                 )}
                 aspect="aspect-[4/5]"
@@ -421,7 +421,7 @@ export default async function AboutPage({ params }: PageProps<"/[lang]/about">) 
             <Reveal variant="mask" as="figure">
               <Figure
                 {...photo(
-                  "/gallery/kitchen/kitchen-island-open-to-living.jpeg",
+                  "/gallery/kitchen/kitchen-island-open-to-living.webp",
                   lang,
                 )}
                 aspect="aspect-[4/3]"
@@ -431,7 +431,7 @@ export default async function AboutPage({ params }: PageProps<"/[lang]/about">) 
             <Reveal variant="mask" as="figure" delay={110}>
               <Figure
                 {...photo(
-                  "/gallery/pool-terrace/pool-through-bougainvillea.jpeg",
+                  "/gallery/pool-terrace/pool-through-bougainvillea.webp",
                   lang,
                 )}
                 aspect="aspect-[4/3]"
@@ -463,7 +463,7 @@ export default async function AboutPage({ params }: PageProps<"/[lang]/about">) 
       <Section tone="canvas" className="pt-14 md:pt-16" space="none">
         <Reveal variant="mask" as="figure">
           <Figure
-            {...photo("/gallery/exterior/villa-facade-from-pool.jpeg", lang)}
+            {...photo("/gallery/exterior/villa-facade-from-pool.webp", lang)}
             aspect="aspect-[21/9]"
             sizes="100vw"
             className="rounded-none ring-0"
@@ -479,7 +479,7 @@ export default async function AboutPage({ params }: PageProps<"/[lang]/about">) 
             <Reveal variant="mask" as="figure">
               <Figure
                 {...photo(
-                  "/gallery/pool-terrace/pool-outdoor-cinema-screen.jpeg",
+                  "/gallery/pool-terrace/pool-outdoor-cinema-screen.webp",
                   lang,
                 )}
                 aspect="aspect-[4/3]"
@@ -489,7 +489,7 @@ export default async function AboutPage({ params }: PageProps<"/[lang]/about">) 
             <Reveal variant="mask" as="figure" delay={110}>
               <Figure
                 {...photo(
-                  "/gallery/living/living-and-dining-toward-pool.jpeg",
+                  "/gallery/living/living-and-dining-toward-pool.webp",
                   lang,
                 )}
                 aspect="aspect-[4/3]"
@@ -499,7 +499,7 @@ export default async function AboutPage({ params }: PageProps<"/[lang]/about">) 
             <Reveal variant="mask" as="figure" delay={220}>
               <Figure
                 {...photo(
-                  "/gallery/details/poolside-tray-and-pomegranates.jpeg",
+                  "/gallery/details/poolside-tray-and-pomegranates.webp",
                   lang,
                 )}
                 aspect="aspect-[4/3]"

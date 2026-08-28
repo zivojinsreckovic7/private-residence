@@ -116,7 +116,7 @@ export function Spaces({ lang }: { lang: Lang }) {
                 className="rounded-surface aspect-[4/3] bg-surface"
               >
                 <Image
-                  src="/gallery/living/dining-table-toward-living-room.jpeg"
+                  src="/gallery/living/dining-table-toward-living-room.webp"
                   alt={t.alts.dining}
                   fill
                   sizes="(min-width: 1024px) 58vw, 100vw"
@@ -135,7 +135,7 @@ export function Spaces({ lang }: { lang: Lang }) {
                 className="rounded-surface aspect-square bg-surface ring-8 ring-canvas"
               >
                 <Image
-                  src="/gallery/living/living-room-and-staircase.jpeg"
+                  src="/gallery/living/living-room-and-staircase.webp"
                   alt={t.alts.staircase}
                   fill
                   sizes="(min-width: 1024px) 28vw, 50vw"
@@ -182,7 +182,7 @@ export function Spaces({ lang }: { lang: Lang }) {
                   className="rounded-surface aspect-[3/4] bg-canvas"
                 >
                   <Image
-                    src="/gallery/bedrooms/double-bedroom-with-balcony.jpeg"
+                    src="/gallery/bedrooms/double-bedroom-with-balcony.webp"
                     alt={t.alts.bedroom}
                     fill
                     sizes="(min-width: 1024px) 30vw, 50vw"
@@ -196,7 +196,7 @@ export function Spaces({ lang }: { lang: Lang }) {
                   className="rounded-surface aspect-[3/4] bg-canvas"
                 >
                   <Image
-                    src="/gallery/bathrooms/bathroom-walk-in-shower.jpeg"
+                    src="/gallery/bathrooms/bathroom-walk-in-shower.webp"
                     alt={t.alts.bathroom}
                     fill
                     sizes="(min-width: 1024px) 30vw, 50vw"
@@ -220,7 +220,7 @@ export function Spaces({ lang }: { lang: Lang }) {
       <section className="relative flex min-h-[86dvh] items-end overflow-clip py-24">
         <Parallax distance={-80} className="absolute inset-0">
           <Image
-            src="/gallery/pool-terrace/covered-terrace-lounge-pool.jpeg"
+            src="/gallery/pool-terrace/covered-terrace-lounge-pool.webp"
             alt={t.alts.terrace}
             fill
             sizes="100vw"
