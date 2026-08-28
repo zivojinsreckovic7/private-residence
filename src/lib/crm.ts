@@ -1,11 +1,12 @@
 import type { ReservationRequest } from "@/lib/reservation-mail";
 
 /**
- * The hand-off to the CRM at `crm.misprivateresidence.com`.
+ * The hand-off to the CRM's API at `api.misprivateresidence.com`.
  *
- * The CRM is a separate application with its own database, and this is the
- * only line between the two: one POST, signed with a shared secret, sent
- * alongside the mail the form already sends.
+ * The CRM is two separate applications — a Django API and a Next.js interface
+ * at `crm.` — and this is the only line between any of it and the website: one
+ * POST to the API, signed with a shared secret, sent alongside the mail the
+ * form already sends. The interface is never involved.
  *
  * **This never throws and never fails the guest's request.** The reservation
  * reaching the residence is the promise the form makes; the reservation
